@@ -3,6 +3,7 @@ package com.rafsan.dynamicui_fromjson
 import android.annotation.SuppressLint
 import android.graphics.Color
 import android.graphics.Typeface
+import android.os.Build
 import android.os.Bundle
 import android.text.*
 import android.text.InputFilter.LengthFilter
@@ -285,15 +286,37 @@ class GenerateFormActivity : AppCompatActivity() {
         }
     }
 
+    @SuppressLint("SetTextI18n")
+    private fun createParagraph(component: FormComponentItem) {
+        val textView = TextView(this)
+
+        val paragraphText: String =
+            component.label?.substring(0, component.label.length - 2) ?: ""
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            if (component.subtype.equals("blockquote")) {
+                textView.text =
+                    "\"" + Html.fromHtml(paragraphText, Html.FROM_HTML_MODE_LEGACY) + "\""
+                textView.setTypeface(null, Typeface.ITALIC)
+            } else textView.text = Html.fromHtml(paragraphText, Html.FROM_HTML_MODE_LEGACY)
+        } else {
+            if (component.subtype.equals("blockquote")) {
+                textView.text = "\"" + Html.fromHtml(paragraphText + "\"")
+                textView.setTypeface(null, Typeface.ITALIC)
+            } else textView.text = Html.fromHtml(paragraphText)
+        }
+
+        textView.setTextColor(Color.parseColor("#000000"))
+        setMerginToviews(textView)
+        textView.setPadding(0, 10, 0, 10)
+        binding.miniAppFormContainer.addView(textView)
+    }
+
     private fun createDatePicker(component: FormComponentItem) {
 
     }
 
     private fun createNumberEditText(component: FormComponentItem) {
-
-    }
-
-    private fun createParagraph(component: FormComponentItem) {
 
     }
 
@@ -319,8 +342,8 @@ class GenerateFormActivity : AppCompatActivity() {
     }
 
     private fun isValueNull(viewComponentModel: FormComponentItem, view: TextView) {
-        if (viewComponentModel.value != null) {
-            view.text = Utils.fromHtml(viewComponentModel.value)
+        viewComponentModel.value?.let {
+            view.text = it
         }
     }
 
