@@ -1,14 +1,13 @@
 package com.rafsan.dynamicui_fromjson
 
 import android.graphics.Color
-import android.os.Build
 import android.os.Bundle
-import android.text.Html
 import android.util.TypedValue
 import android.view.Gravity
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import android.widget.EditText
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.LinearLayoutCompat
@@ -20,6 +19,7 @@ import com.rafsan.dynamicui_fromjson.databinding.ActivityGenerateFormBinding
 import com.rafsan.dynamicui_fromjson.model.FormComponent
 import com.rafsan.dynamicui_fromjson.model.FormComponentItem
 import com.rafsan.dynamicui_fromjson.model.FormViewComponent
+import com.rafsan.dynamicui_fromjson.utils.Utils
 import java.util.*
 
 class GenerateFormActivity : AppCompatActivity() {
@@ -78,8 +78,9 @@ class GenerateFormActivity : AppCompatActivity() {
             "h2" -> txtHeader.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18f)
             "h3" -> txtHeader.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16f)
         }
-
-        txtHeader.setText(fromHtml(componentItem.label))
+        componentItem.label?.let {
+            txtHeader.setText(Utils.fromHtml(it))
+        }
 
         txtHeader.layoutParams = LinearLayoutCompat.LayoutParams(
             ViewGroup.LayoutParams.MATCH_PARENT,
@@ -120,9 +121,27 @@ class GenerateFormActivity : AppCompatActivity() {
 
     }
 
-    fun fromHtml(str: String): String {
-        return if (Build.VERSION.SDK_INT >= 24) Html.fromHtml(str, Html.FROM_HTML_MODE_LEGACY)
-            .toString() else Html.fromHtml(str).toString()
+    private fun isLabelNull(viewComponentModel: FormComponentItem) {
+        if (viewComponentModel.label != null) createLabelForViews(viewComponentModel)
+    }
+
+    private fun isSubTypeNull(viewComponentModel: FormComponentItem, editText: EditText) {
+        if (viewComponentModel.subtype != null) {
+            setInputTypeForEditText(editText, viewComponentModel)
+        }
+    }
+
+    private fun isPlaceHolderNull(
+        viewComponentModel: FormComponentItem,
+        editText: EditText
+    ) {
+        if (viewComponentModel.placeholder != null) editText.setHint(viewComponentModel.placeholder)
+    }
+
+    private fun isValueNull(viewComponentModel: FormComponentItem, view: TextView) {
+        if (viewComponentModel.value != null) {
+            view.text = Utils.fromHtml(viewComponentModel.value)
+        }
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
