@@ -4,10 +4,14 @@ import android.content.Context
 import android.content.res.ColorStateList
 import android.os.Build
 import android.text.Html
+import android.util.Log
 import android.view.View
 import android.widget.LinearLayout
 import androidx.core.content.ContextCompat
 import com.rafsan.dynamicui_fromjson.R
+import java.text.ParseException
+import java.text.SimpleDateFormat
+import java.util.*
 
 class Utils {
     companion object {
@@ -50,6 +54,34 @@ class Utils {
                     ContextCompat.getColor(context, R.color.teal_500) //enabled
                 )
             )
+        }
+
+        fun getCurrentDate(): Date {
+            val calendar = Calendar.getInstance()
+            return calendar.time
+        }
+
+        fun getDateStringToShow(date: Date, format: String): String {
+            try {
+                val simpleDateFormat = SimpleDateFormat(format, Locale.ENGLISH);
+                return simpleDateFormat.format(date)
+            } catch (e: Exception) {
+                Log.d("Error", e.toString())
+                return ""
+            }
+        }
+
+        fun getDateFromString(date: String, format: String): Date? {
+            Log.i("StringDate", date)
+            val simpleDateFormat = SimpleDateFormat(format, Locale.ENGLISH)
+            try {
+                val formatedDate = simpleDateFormat.parse(date)
+                Log.i("ParsedDate", formatedDate.toString())
+                return formatedDate
+            } catch (e: ParseException) {
+                e.printStackTrace()
+            }
+            return null
         }
     }
 }

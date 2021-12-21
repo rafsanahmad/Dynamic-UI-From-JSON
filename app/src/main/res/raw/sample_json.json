@@ -19,7 +19,8 @@
     "className": "form-control",
     "name": "text-1640082066779-0",
     "access": false,
-    "subtype": "text"
+    "subtype": "text",
+    "maxlength": 60
   },
   {
     "type": "number",

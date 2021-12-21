@@ -1,6 +1,7 @@
 package com.rafsan.dynamicui_fromjson
 
 import android.annotation.SuppressLint
+import android.app.DatePickerDialog
 import android.graphics.Color
 import android.graphics.Typeface
 import android.os.Build
@@ -29,7 +30,10 @@ import com.rafsan.dynamicui_fromjson.model.FormComponentItem
 import com.rafsan.dynamicui_fromjson.model.FormViewComponent
 import com.rafsan.dynamicui_fromjson.model.Value
 import com.rafsan.dynamicui_fromjson.utils.Utils
+import com.rafsan.dynamicui_fromjson.utils.Utils.Companion.getCurrentDate
 import com.rafsan.dynamicui_fromjson.utils.Utils.Companion.getCustomColorStateList
+import com.rafsan.dynamicui_fromjson.utils.Utils.Companion.getDateFromString
+import com.rafsan.dynamicui_fromjson.utils.Utils.Companion.getDateStringToShow
 import com.rafsan.dynamicui_fromjson.utils.Utils.Companion.method
 import com.rafsan.dynamicui_fromjson.utils.Utils.Companion.setMerginToviews
 import java.util.*
@@ -313,7 +317,65 @@ class GenerateFormActivity : AppCompatActivity() {
     }
 
     private fun createDatePicker(component: FormComponentItem) {
+        val relativeLayout = RelativeLayout(this)
+        relativeLayout.setPadding(5, 10, 5, 10)
+        val layoutParams = LinearLayout.LayoutParams(
+            RelativeLayout.LayoutParams.MATCH_PARENT,
+            RelativeLayout.LayoutParams.WRAP_CONTENT
+        )
+        layoutParams.setMargins(40, 40, 40, 40)
+        relativeLayout.layoutParams = layoutParams
 
+        component.label?.let { labelString ->
+            val textView = TextView(this)
+            textView.setTextColor(Color.BLACK)
+            textView.setTypeface(null, Typeface.BOLD)
+            component.required?.let { required ->
+                if (required) {
+                    textView.setText(labelStringForRequiredField(labelString))
+                } else {
+                    textView.text = createStringForViewLabel(false, labelString)
+                }
+            }
+            val layoutParams1 = RelativeLayout.LayoutParams(
+                RelativeLayout.LayoutParams.WRAP_CONTENT,
+                RelativeLayout.LayoutParams.WRAP_CONTENT
+            )
+            layoutParams1.addRule(RelativeLayout.ALIGN_PARENT_LEFT)
+            layoutParams1.addRule(RelativeLayout.CENTER_VERTICAL)
+            relativeLayout.addView(textView)
+        }
+
+        val txtDate = TextView(this)
+        val layoutParams1 = RelativeLayout.LayoutParams(
+            RelativeLayout.LayoutParams.WRAP_CONTENT,
+            RelativeLayout.LayoutParams.WRAP_CONTENT
+        )
+        layoutParams1.addRule(RelativeLayout.ALIGN_PARENT_RIGHT)
+        layoutParams1.addRule(RelativeLayout.CENTER_VERTICAL)
+        txtDate.layoutParams = layoutParams1
+        relativeLayout.addView(txtDate)
+
+        txtDate.text = getDateStringToShow(getCurrentDate(), "MMMM d, yyyy")
+
+        relativeLayout.setOnClickListener {
+            val calendar: Calendar = GregorianCalendar()
+            calendar.time = getDateFromString(txtDate.text.toString(), "MMMM d, yyyy")
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                val datePickerDialog = DatePickerDialog(
+                    this@GenerateFormActivity,
+                    { view, year, month, dayOfMonth ->
+                        val selectedDate = Calendar.getInstance()
+                        selectedDate[year, month] = dayOfMonth
+                        txtDate.setText(getDateStringToShow(selectedDate.time, "MMMM d, yyyy"))
+                    }, calendar[Calendar.YEAR], calendar[Calendar.MONTH],
+                    calendar[Calendar.DAY_OF_MONTH]
+                )
+                datePickerDialog.show()
+            }
+        }
+        binding.miniAppFormContainer.addView(relativeLayout)
+        formViewCollection.add(FormViewComponent(txtDate, component))
     }
 
     private fun createNumberEditText(component: FormComponentItem) {
