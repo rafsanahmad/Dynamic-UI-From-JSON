@@ -1,0 +1,144 @@
+[
+  {
+    "type": "header",
+    "subtype": "h1",
+    "label": "General Information form",
+    "access": false
+  },
+  {
+    "type": "paragraph",
+    "subtype": "p",
+    "label": "Please fill-up the form with correct information...",
+    "access": false
+  },
+  {
+    "type": "text",
+    "required": false,
+    "label": "Enter your name",
+    "placeholder": "full name",
+    "className": "form-control",
+    "name": "text-1640082066779-0",
+    "access": false,
+    "subtype": "text"
+  },
+  {
+    "type": "number",
+    "required": false,
+    "label": "Age",
+    "className": "form-control",
+    "name": "number-1640082094782-0",
+    "access": false,
+    "min": 10,
+    "max": 100
+  },
+  {
+    "type": "radio-group",
+    "required": false,
+    "label": "Gender",
+    "inline": false,
+    "name": "radio-group-1640082112533-0",
+    "access": false,
+    "other": false,
+    "values": [
+      {
+        "label": "Male",
+        "value": "option-1",
+        "selected": false
+      },
+      {
+        "label": "Female",
+        "value": "option-2",
+        "selected": false
+      }
+    ]
+  },
+  {
+    "type": "select",
+    "required": false,
+    "label": "Country of origin",
+    "className": "form-control",
+    "name": "select-1640082150449-0",
+    "access": false,
+    "multiple": false,
+    "values": [
+      {
+        "label": "Australia",
+        "value": "option-1",
+        "selected": true
+      },
+      {
+        "label": "Bangladesh",
+        "value": "option-2",
+        "selected": false
+      },
+      {
+        "label": "India",
+        "value": "option-3",
+        "selected": false
+      },
+      {
+        "label": "United Kingdom",
+        "value": "",
+        "selected": false
+      },
+      {
+        "label": "United State",
+        "value": "",
+        "selected": false
+      },
+      {
+        "label": "Germany",
+        "value": "",
+        "selected": false
+      }
+    ]
+  },
+  {
+    "type": "textarea",
+    "required": false,
+    "label": "Enter your address",
+    "className": "form-control",
+    "name": "textarea-1640082215264-0",
+    "access": false,
+    "subtype": "textarea"
+  },
+  {
+    "type": "checkbox-group",
+    "required": false,
+    "label": "Choose Marital Status",
+    "toggle": false,
+    "inline": false,
+    "name": "checkbox-group-1640082315632-0",
+    "access": false,
+    "other": false,
+    "values": [
+      {
+        "label": "Married",
+        "value": "option-1",
+        "selected": true
+      },
+      {
+        "label": "Unmarried",
+        "value": "",
+        "selected": false
+      }
+    ]
+  },
+  {
+    "type": "date",
+    "required": false,
+    "label": "Date of submission",
+    "className": "form-control",
+    "name": "date-1640082355015-0",
+    "access": false
+  },
+  {
+    "type": "button",
+    "label": "Submit form",
+    "subtype": "button",
+    "className": "btn-default btn",
+    "name": "button-1640082377047-0",
+    "access": false,
+    "style": "default"
+  }
+]
