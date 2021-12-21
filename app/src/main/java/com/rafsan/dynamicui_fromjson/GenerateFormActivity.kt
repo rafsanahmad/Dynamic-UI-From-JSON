@@ -1,5 +1,6 @@
 package com.rafsan.dynamicui_fromjson
 
+import android.annotation.SuppressLint
 import android.graphics.Color
 import android.graphics.Typeface
 import android.os.Bundle
@@ -15,6 +16,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.AppCompatRadioButton
 import androidx.appcompat.widget.LinearLayoutCompat
 import androidx.core.app.NavUtils
 import com.google.gson.Gson
@@ -24,7 +26,9 @@ import com.rafsan.dynamicui_fromjson.databinding.ActivityGenerateFormBinding
 import com.rafsan.dynamicui_fromjson.model.FormComponent
 import com.rafsan.dynamicui_fromjson.model.FormComponentItem
 import com.rafsan.dynamicui_fromjson.model.FormViewComponent
+import com.rafsan.dynamicui_fromjson.model.Value
 import com.rafsan.dynamicui_fromjson.utils.Utils
+import com.rafsan.dynamicui_fromjson.utils.Utils.Companion.getCustomColorStateList
 import com.rafsan.dynamicui_fromjson.utils.Utils.Companion.method
 import com.rafsan.dynamicui_fromjson.utils.Utils.Companion.setMerginToviews
 import java.util.*
@@ -188,6 +192,99 @@ class GenerateFormActivity : AppCompatActivity() {
         formViewCollection.add(FormViewComponent(spinner, component))
     }
 
+    @SuppressLint("RestrictedApi")
+    private fun createRadioGroup(component: FormComponentItem, viewId: Int) {
+        createLabelForViews(component)
+        var selectedItem = 0
+        var isRadioButtonSelected = false
+
+        val radioGroup = RadioGroup(this)
+        radioGroup.id = viewId
+        Log.i("RadioGroupId", radioGroup.id.toString() + " " + radioGroup.tag)
+        radioGroup.orientation = LinearLayout.VERTICAL
+        setMerginToviews(radioGroup)
+
+        component.values?.let {
+            for (i in it.indices) {
+                val value = it[i]
+                val radioButton = AppCompatRadioButton(this)
+                radioButton.setText(value.label)
+                radioButton.supportButtonTintList = getCustomColorStateList(this)
+
+                value.selected?.let { selected ->
+                    if (selected) {
+                        selectedItem = i
+                        isRadioButtonSelected = true
+                    }
+                }
+                radioGroup.addView(radioButton)
+            }
+            component.toggle?.let { selected ->
+                if (selected) {
+                    val radioGroupContainer = RelativeLayout(this)
+                    var valueModels: MutableList<Value> = mutableListOf()
+                    component.values.let {
+                        valueModels = it as MutableList<Value>
+                    }
+                    val valueModel = Value("Other", null, null)
+                    valueModels.add(valueModel)
+                    val radioButton = AppCompatRadioButton(this)
+                    radioButton.setText(valueModel.label)
+                    radioButton.supportButtonTintList = getCustomColorStateList(this)
+                    radioGroup.addView(radioButton)
+                    radioGroupContainer.addView(radioGroup)
+                    val otherText = EditText(this)
+                    otherText.setBackgroundResource(R.drawable.edit_text_background)
+                    otherText.isEnabled = false
+                    val otherTextParam = RelativeLayout.LayoutParams(
+                        RelativeLayout.LayoutParams.MATCH_PARENT,
+                        RelativeLayout.LayoutParams.WRAP_CONTENT
+                    )
+                    otherTextParam.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM)
+                    otherTextParam.addRule(RelativeLayout.RIGHT_OF, radioGroup.id)
+                    //otherTextParam.setMargins(10, 0, 40, 0);
+                    otherText.layoutParams = otherTextParam
+                    otherText.setPadding(10, 8, 10, 8)
+                    otherText.maxLines = 1
+                    radioGroupContainer.addView(otherText)
+                    otherText.addTextChangedListener(object : TextWatcher {
+                        override fun beforeTextChanged(
+                            s: CharSequence,
+                            start: Int,
+                            count: Int,
+                            after: Int
+                        ) {
+                        }
+
+                        override fun onTextChanged(
+                            s: CharSequence,
+                            start: Int,
+                            before: Int,
+                            count: Int
+                        ) {
+                        }
+
+                        override fun afterTextChanged(s: Editable) {
+                            if (otherText.text.toString() != "") {
+                                valueModel.value = otherText.text.toString()
+                            }
+                        }
+                    })
+                    radioButton.setOnCheckedChangeListener { buttonView, isChecked ->
+                        otherText.isEnabled = isChecked
+                    }
+                    binding.miniAppFormContainer.addView(radioGroupContainer)
+                    formViewCollection.add(FormViewComponent(radioGroup, component))
+                } else {
+                    binding.miniAppFormContainer.addView(radioGroup)
+                    formViewCollection.add(FormViewComponent(radioGroup, component))
+                }
+            }
+            if (isRadioButtonSelected) (radioGroup.getChildAt(selectedItem) as RadioButton).isChecked =
+                true
+        }
+    }
+
     private fun createDatePicker(component: FormComponentItem) {
 
     }
@@ -201,10 +298,6 @@ class GenerateFormActivity : AppCompatActivity() {
     }
 
     private fun createCheckBoxGroup(component: FormComponentItem, viewId: Int) {
-
-    }
-
-    private fun createRadioGroup(component: FormComponentItem, viewId: Int) {
 
     }
 
