@@ -13,9 +13,7 @@ import android.view.Gravity
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import android.widget.EditText
-import android.widget.LinearLayout
-import android.widget.TextView
+import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.LinearLayoutCompat
 import androidx.core.app.NavUtils
@@ -155,7 +153,39 @@ class GenerateFormActivity : AppCompatActivity() {
     }
 
     private fun createSpinner(component: FormComponentItem, viewId: Int) {
+        var selectedIndex = 0
+        createLabelForViews(component)
+        val layoutParams: LinearLayout.LayoutParams = LinearLayout.LayoutParams(
+            LinearLayout.LayoutParams.MATCH_PARENT,
+            LinearLayout.LayoutParams.WRAP_CONTENT
+        )
+        layoutParams.setMargins(40, 30, 40, 40)
+        val spinner = Spinner(this)
+        spinner.id = viewId
+        spinner.setBackgroundColor(Color.WHITE)
+        spinner.setBackgroundResource(R.drawable.edit_text_background)
+        spinner.layoutParams = layoutParams
+        //Spinner data source
+        val spinnerDatasource = mutableListOf<Any?>()
+        component.values?.let {
+            for (j in it.indices) {
+                val value = it[j]
+                spinnerDatasource.add(value.label)
+                value.selected?.let { selected ->
+                    if (selected)
+                        selectedIndex = j
+                }
+            }
 
+            val spinnerAdapter: ArrayAdapter<*> = ArrayAdapter<Any?>(
+                applicationContext,
+                R.layout.form_spinner_row, spinnerDatasource
+            )
+            spinner.adapter = spinnerAdapter
+            spinner.setSelection(selectedIndex)
+        }
+        binding.miniAppFormContainer.addView(spinner)
+        formViewCollection.add(FormViewComponent(spinner, component))
     }
 
     private fun createDatePicker(component: FormComponentItem) {
@@ -205,7 +235,7 @@ class GenerateFormActivity : AppCompatActivity() {
         val label = TextView(this)
         label.setTextColor(Color.BLACK)
         label.setTypeface(null, Typeface.BOLD)
-        Utils.setMerginToviews(
+        setMerginToviews(
             label,
             40,
             LinearLayoutCompat.LayoutParams.WRAP_CONTENT,
