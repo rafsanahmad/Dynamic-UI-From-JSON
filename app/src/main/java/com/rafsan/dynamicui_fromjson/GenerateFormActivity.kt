@@ -18,8 +18,10 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.AppCompatCheckBox
 import androidx.appcompat.widget.AppCompatRadioButton
 import androidx.appcompat.widget.LinearLayoutCompat
+import androidx.appcompat.widget.SwitchCompat
 import androidx.core.app.NavUtils
 import com.google.gson.Gson
 import com.google.gson.JsonArray
@@ -36,6 +38,7 @@ import com.rafsan.dynamicui_fromjson.utils.Utils.Companion.getDateFromString
 import com.rafsan.dynamicui_fromjson.utils.Utils.Companion.getDateStringToShow
 import com.rafsan.dynamicui_fromjson.utils.Utils.Companion.method
 import com.rafsan.dynamicui_fromjson.utils.Utils.Companion.setMerginToviews
+import com.rafsan.dynamicui_fromjson.utils.Utils.Companion.setSwitchColor
 import java.util.*
 
 class GenerateFormActivity : AppCompatActivity() {
@@ -139,10 +142,7 @@ class GenerateFormActivity : AppCompatActivity() {
             }
             editText.addTextChangedListener(object : TextWatcher {
                 override fun beforeTextChanged(
-                    s: CharSequence,
-                    start: Int,
-                    count: Int,
-                    after: Int
+                    s: CharSequence, start: Int, count: Int, after: Int
                 ) {
                 }
 
@@ -224,66 +224,58 @@ class GenerateFormActivity : AppCompatActivity() {
                 }
                 radioGroup.addView(radioButton)
             }
-            component.toggle?.let { selected ->
-                if (selected) {
-                    val radioGroupContainer = RelativeLayout(this)
-                    var valueModels: MutableList<Value> = mutableListOf()
-                    component.values.let {
-                        valueModels = it as MutableList<Value>
-                    }
-                    val valueModel = Value("Other", null, null)
-                    valueModels.add(valueModel)
-                    val radioButton = AppCompatRadioButton(this)
-                    radioButton.setText(valueModel.label)
-                    radioButton.supportButtonTintList = getCustomColorStateList(this)
-                    radioGroup.addView(radioButton)
-                    radioGroupContainer.addView(radioGroup)
-                    val otherText = EditText(this)
-                    otherText.setBackgroundResource(R.drawable.edit_text_background)
-                    otherText.isEnabled = false
-                    val otherTextParam = RelativeLayout.LayoutParams(
-                        RelativeLayout.LayoutParams.MATCH_PARENT,
-                        RelativeLayout.LayoutParams.WRAP_CONTENT
-                    )
-                    otherTextParam.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM)
-                    otherTextParam.addRule(RelativeLayout.RIGHT_OF, radioGroup.id)
-                    //otherTextParam.setMargins(10, 0, 40, 0);
-                    otherText.layoutParams = otherTextParam
-                    otherText.setPadding(10, 8, 10, 8)
-                    otherText.maxLines = 1
-                    radioGroupContainer.addView(otherText)
-                    otherText.addTextChangedListener(object : TextWatcher {
-                        override fun beforeTextChanged(
-                            s: CharSequence,
-                            start: Int,
-                            count: Int,
-                            after: Int
-                        ) {
-                        }
-
-                        override fun onTextChanged(
-                            s: CharSequence,
-                            start: Int,
-                            before: Int,
-                            count: Int
-                        ) {
-                        }
-
-                        override fun afterTextChanged(s: Editable) {
-                            if (otherText.text.toString() != "") {
-                                valueModel.value = otherText.text.toString()
-                            }
-                        }
-                    })
-                    radioButton.setOnCheckedChangeListener { buttonView, isChecked ->
-                        otherText.isEnabled = isChecked
-                    }
-                    binding.miniAppFormContainer.addView(radioGroupContainer)
-                    formViewCollection.add(FormViewComponent(radioGroup, component))
-                } else {
-                    binding.miniAppFormContainer.addView(radioGroup)
-                    formViewCollection.add(FormViewComponent(radioGroup, component))
+            if (component.toggle != null && component.toggle) {
+                val radioGroupContainer = RelativeLayout(this)
+                var valueModels: MutableList<Value> = mutableListOf()
+                component.values.let {
+                    valueModels = it as MutableList<Value>
                 }
+                val valueModel = Value("Other", null, null)
+                valueModels.add(valueModel)
+                val radioButton = AppCompatRadioButton(this)
+                radioButton.setText(valueModel.label)
+                radioButton.supportButtonTintList = getCustomColorStateList(this)
+                radioGroup.addView(radioButton)
+                radioGroupContainer.addView(radioGroup)
+                val otherText = EditText(this)
+                otherText.setBackgroundResource(R.drawable.edit_text_background)
+                otherText.isEnabled = false
+                val otherTextParam = RelativeLayout.LayoutParams(
+                    RelativeLayout.LayoutParams.MATCH_PARENT,
+                    RelativeLayout.LayoutParams.WRAP_CONTENT
+                )
+                otherTextParam.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM)
+                otherTextParam.addRule(RelativeLayout.RIGHT_OF, radioGroup.id)
+                //otherTextParam.setMargins(10, 0, 40, 0);
+                otherText.layoutParams = otherTextParam
+                otherText.setPadding(10, 8, 10, 8)
+                otherText.maxLines = 1
+                radioGroupContainer.addView(otherText)
+                otherText.addTextChangedListener(object : TextWatcher {
+                    override fun beforeTextChanged(
+                        s: CharSequence, start: Int, count: Int, after: Int
+                    ) {
+                    }
+
+                    override fun onTextChanged(
+                        s: CharSequence, start: Int, before: Int, count: Int
+                    ) {
+                    }
+
+                    override fun afterTextChanged(s: Editable) {
+                        if (otherText.text.toString() != "") {
+                            valueModel.value = otherText.text.toString()
+                        }
+                    }
+                })
+                radioButton.setOnCheckedChangeListener { buttonView, isChecked ->
+                    otherText.isEnabled = isChecked
+                }
+                binding.miniAppFormContainer.addView(radioGroupContainer)
+                formViewCollection.add(FormViewComponent(radioGroup, component))
+            } else {
+                binding.miniAppFormContainer.addView(radioGroup)
+                formViewCollection.add(FormViewComponent(radioGroup, component))
             }
             if (isRadioButtonSelected) (radioGroup.getChildAt(selectedItem) as RadioButton).isChecked =
                 true
@@ -360,8 +352,9 @@ class GenerateFormActivity : AppCompatActivity() {
 
         relativeLayout.setOnClickListener {
             val calendar: Calendar = GregorianCalendar()
-            calendar.time = getDateFromString(txtDate.text.toString(), "MMMM d, yyyy")
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            val dateString = getDateFromString(txtDate.text.toString(), "MMMM d, yyyy")
+            dateString?.let {
+                calendar.time = it
                 val datePickerDialog = DatePickerDialog(
                     this@GenerateFormActivity,
                     { view, year, month, dayOfMonth ->
@@ -378,12 +371,206 @@ class GenerateFormActivity : AppCompatActivity() {
         formViewCollection.add(FormViewComponent(txtDate, component))
     }
 
+    private fun createCheckBoxGroup(component: FormComponentItem, viewId: Int) {
+        isLabelNull(component)
+        if (component.toggle != null && component.toggle) {
+            createToggleCheckBoxGroup(component, viewId)
+        } else createCheckBoxGroupUtil(component, viewId)
+    }
+
     private fun createNumberEditText(component: FormComponentItem) {
 
     }
 
-    private fun createCheckBoxGroup(component: FormComponentItem, viewId: Int) {
+    @SuppressLint("RestrictedApi")
+    private fun createCheckBoxGroupUtil(component: FormComponentItem, id: Int) {
+        val checkBoxContainer = LinearLayout(this)
+        checkBoxContainer.id = id
+        checkBoxContainer.orientation = LinearLayout.VERTICAL
+        val layoutParams = LinearLayout.LayoutParams(
+            LinearLayout.LayoutParams.WRAP_CONTENT,
+            LinearLayout.LayoutParams.WRAP_CONTENT
+        )
+        checkBoxContainer.layoutParams = layoutParams
+        component.values?.let {
+            for (i in it.indices) {
+                val valueModel = it[i]
+                val checkBox = AppCompatCheckBox(this)
+                checkBox.setText(valueModel.label)
+                val layoutParams1 = LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT
+                )
+                layoutParams1.setMargins(70, 20, 20, 0)
+                checkBox.layoutParams = layoutParams1
+                valueModel.selected?.let { selected ->
+                    if (selected) {
+                        checkBox.isChecked = true
+                    }
+                }
+                checkBox.supportButtonTintList = getCustomColorStateList(this)
+                checkBoxContainer.addView(checkBox)
+            }
+            if (component.toggle != null && component.toggle) {
+                val rootContainer = RelativeLayout(this)
+                var valueModels: MutableList<Value> = mutableListOf()
+                component.values.let {
+                    valueModels = it as MutableList<Value>
+                }
+                val valueModel = Value("Other", null, null)
+                valueModels.add(valueModel)
+                val checkBox = AppCompatCheckBox(this)
+                checkBox.setText(valueModel.label)
+                setMerginToviews(
+                    checkBox, 20,
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT
+                )
+                valueModel.selected?.let { selected ->
+                    if (selected) {
+                        checkBox.isChecked = true
+                    }
+                }
 
+                checkBox.supportButtonTintList = getCustomColorStateList(this)
+                checkBoxContainer.addView(checkBox)
+                rootContainer.addView(checkBoxContainer)
+                val otherText = EditText(this)
+                otherText.setBackgroundResource(R.drawable.edit_text_background)
+                otherText.isEnabled = false
+                val otherTextParam = RelativeLayout.LayoutParams(
+                    RelativeLayout.LayoutParams.MATCH_PARENT,
+                    RelativeLayout.LayoutParams.WRAP_CONTENT
+                )
+                otherTextParam.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM)
+                otherTextParam.addRule(RelativeLayout.RIGHT_OF, checkBoxContainer.id)
+                otherTextParam.setMargins(10, 0, 40, 0)
+                otherText.layoutParams = otherTextParam
+                otherText.setPadding(10, 8, 10, 8)
+                otherText.maxLines = 1
+                rootContainer.addView(otherText)
+                otherText.addTextChangedListener(object : TextWatcher {
+                    override fun beforeTextChanged(
+                        s: CharSequence, start: Int, count: Int, after: Int
+                    ) {
+                    }
+
+                    override fun onTextChanged(
+                        s: CharSequence, start: Int, before: Int, count: Int
+                    ) {
+                    }
+
+                    override fun afterTextChanged(s: Editable) {
+                        if (otherText.text.toString() != "") {
+                            valueModel.value = otherText.text.toString()
+                        }
+                    }
+                })
+                checkBox.setOnCheckedChangeListener { buttonView, isChecked ->
+                    otherText.isEnabled = isChecked
+                }
+                binding.miniAppFormContainer.addView(rootContainer)
+                formViewCollection.add(FormViewComponent(checkBoxContainer, component))
+            } else {
+                binding.miniAppFormContainer.addView(checkBoxContainer)
+                formViewCollection.add(FormViewComponent(checkBoxContainer, component))
+            }
+        }
+    }
+
+    /**
+     * Checkbox group with Switch
+     */
+    private fun createToggleCheckBoxGroup(viewComponentModel: FormComponentItem, id: Int) {
+        val switchContainer = LinearLayout(this)
+        switchContainer.id = id
+        switchContainer.orientation = LinearLayout.VERTICAL
+        val layoutParams = LinearLayout.LayoutParams(
+            LinearLayout.LayoutParams.WRAP_CONTENT,
+            LinearLayout.LayoutParams.WRAP_CONTENT
+        )
+        switchContainer.layoutParams = layoutParams
+        viewComponentModel.values?.let {
+            for (i in it.indices) {
+                val valueModel = it[i]
+                val mySwitch = SwitchCompat(this)
+                mySwitch.setText(valueModel.label)
+                val layoutParams1 = LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT
+                )
+                layoutParams1.setMargins(80, 20, 20, 0)
+                mySwitch.layoutParams = layoutParams1
+                valueModel.selected?.let { selected ->
+                    if (selected) {
+                        mySwitch.isChecked = true
+                    }
+                }
+                setSwitchColor(mySwitch, this)
+                switchContainer.addView(mySwitch)
+            }
+            if (viewComponentModel.toggle != null && viewComponentModel.toggle) {
+                val rootContainer = RelativeLayout(this)
+                val valueModels: MutableList<Value> = mutableListOf()
+                val valueModel = Value("Other", null, null)
+                valueModels.add(valueModel)
+                val mySwitch = SwitchCompat(this)
+                mySwitch.setText(valueModel.label)
+                val layoutParams1 = LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT
+                )
+                layoutParams1.setMargins(80, 20, 20, 0)
+                mySwitch.layoutParams = layoutParams1
+                valueModel.selected?.let { selected ->
+                    if (selected) {
+                        mySwitch.isChecked = true
+                    }
+                }
+                setSwitchColor(mySwitch, this)
+                switchContainer.addView(mySwitch)
+                rootContainer.addView(switchContainer)
+                val otherText = EditText(this)
+                otherText.setBackgroundResource(R.drawable.edit_text_background)
+                otherText.isEnabled = false
+                val otherTextParam = RelativeLayout.LayoutParams(
+                    RelativeLayout.LayoutParams.MATCH_PARENT,
+                    RelativeLayout.LayoutParams.WRAP_CONTENT
+                )
+                otherTextParam.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM)
+                otherTextParam.addRule(RelativeLayout.RIGHT_OF, switchContainer.id)
+                otherTextParam.setMargins(10, 0, 40, 0)
+                otherText.layoutParams = otherTextParam
+                otherText.setPadding(10, 8, 10, 8)
+                otherText.maxLines = 1
+                rootContainer.addView(otherText)
+                otherText.addTextChangedListener(object : TextWatcher {
+                    override fun beforeTextChanged(
+                        s: CharSequence, start: Int, count: Int, after: Int
+                    ) {
+                    }
+
+                    override fun onTextChanged(
+                        s: CharSequence, start: Int, before: Int, count: Int
+                    ) {
+                    }
+
+                    override fun afterTextChanged(s: Editable) {
+                        if (otherText.text.toString() != "") {
+                            valueModel.value = otherText.text.toString()
+                        }
+                    }
+                })
+                mySwitch.setOnCheckedChangeListener { buttonView, isChecked ->
+                    otherText.isEnabled = isChecked
+                }
+                binding.miniAppFormContainer.addView(rootContainer)
+                formViewCollection.add(FormViewComponent(switchContainer, viewComponentModel))
+            } else {
+                binding.miniAppFormContainer.addView(switchContainer)
+                formViewCollection.add(FormViewComponent(switchContainer, viewComponentModel))
+            }
+        }
     }
 
     private fun isLabelNull(viewComponentModel: FormComponentItem) {

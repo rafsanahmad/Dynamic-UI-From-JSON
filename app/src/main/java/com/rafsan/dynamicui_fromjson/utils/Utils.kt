@@ -2,12 +2,15 @@ package com.rafsan.dynamicui_fromjson.utils
 
 import android.content.Context
 import android.content.res.ColorStateList
+import android.graphics.Color
 import android.os.Build
 import android.text.Html
 import android.util.Log
 import android.view.View
 import android.widget.LinearLayout
+import androidx.appcompat.widget.SwitchCompat
 import androidx.core.content.ContextCompat
+import androidx.core.graphics.drawable.DrawableCompat
 import com.rafsan.dynamicui_fromjson.R
 import java.text.ParseException
 import java.text.SimpleDateFormat
@@ -82,6 +85,38 @@ class Utils {
                 e.printStackTrace()
             }
             return null
+        }
+
+        fun setSwitchColor(v: SwitchCompat, context: Context) {
+            // thumb color of your choice
+            val thumbColor = ContextCompat.getColor(context, R.color.teal_500)
+
+            // trackColor is the thumbColor with 30% transparency (77)
+            val trackColor = Color.argb(
+                77, Color.red(thumbColor),
+                Color.green(thumbColor),
+                Color.blue(thumbColor)
+            )
+
+            // setting the thumb color
+            DrawableCompat.setTintList(
+                v.thumbDrawable, ColorStateList(
+                    arrayOf(intArrayOf(android.R.attr.state_checked), intArrayOf()), intArrayOf(
+                        thumbColor,
+                        Color.WHITE
+                    )
+                )
+            )
+
+            // setting the track color
+            DrawableCompat.setTintList(
+                v.trackDrawable, ColorStateList(
+                    arrayOf(intArrayOf(android.R.attr.state_checked), intArrayOf()), intArrayOf(
+                        trackColor,
+                        Color.parseColor("#4D000000") // full black with 30% transparency (4D)
+                    )
+                )
+            )
         }
     }
 }
