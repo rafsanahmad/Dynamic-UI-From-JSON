@@ -3,18 +3,18 @@ package com.rafsan.dynamicui_fromjson
 import android.graphics.Color
 import android.graphics.Typeface
 import android.os.Bundle
-import android.text.InputType
-import android.text.Spannable
-import android.text.SpannableString
-import android.text.SpannableStringBuilder
+import android.text.*
+import android.text.InputFilter.LengthFilter
 import android.text.style.ForegroundColorSpan
 import android.text.style.RelativeSizeSpan
+import android.util.Log
 import android.util.TypedValue
 import android.view.Gravity
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
+import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.LinearLayoutCompat
@@ -27,6 +27,8 @@ import com.rafsan.dynamicui_fromjson.model.FormComponent
 import com.rafsan.dynamicui_fromjson.model.FormComponentItem
 import com.rafsan.dynamicui_fromjson.model.FormViewComponent
 import com.rafsan.dynamicui_fromjson.utils.Utils
+import com.rafsan.dynamicui_fromjson.utils.Utils.Companion.method
+import com.rafsan.dynamicui_fromjson.utils.Utils.Companion.setMerginToviews
 import java.util.*
 
 class GenerateFormActivity : AppCompatActivity() {
@@ -99,6 +101,58 @@ class GenerateFormActivity : AppCompatActivity() {
         return txtHeader
     }
 
+    private fun createEditableTextWithLabel(component: FormComponentItem, viewId: Int) {
+        isLabelNull(component)
+        val editText = EditText(this)
+        var rows = 1
+
+        setMerginToviews(
+            editText, 20,
+            LinearLayoutCompat.LayoutParams.MATCH_PARENT,
+            LinearLayout.LayoutParams.WRAP_CONTENT
+        )
+        if (component.type.equals("textarea")) editText.gravity = Gravity.NO_GRAVITY
+
+        editText.setPadding(20, 30, 20, 30)
+        editText.setBackgroundResource(R.drawable.edit_text_background)
+        editText.id = viewId
+        isValueNull(component, editText)
+        isSubTypeNull(component, editText)
+        isPlaceHolderNull(component, editText)
+        component.maxlength?.let {
+            editText.filters =
+                arrayOf<InputFilter>(LengthFilter(it.toInt()))
+        }
+
+        component.rows?.let {
+            rows = it.toInt()
+            val finalRow = rows
+            editText.setOnKeyListener { v, keyCode, event ->
+                (v as EditText).lineCount > finalRow
+            }
+            editText.addTextChangedListener(object : TextWatcher {
+                override fun beforeTextChanged(
+                    s: CharSequence,
+                    start: Int,
+                    count: Int,
+                    after: Int
+                ) {
+                }
+
+                override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {}
+                override fun afterTextChanged(s: Editable) {
+                    if (editText.lineCount > finalRow) {
+                        editText.setText(method(editText.text.toString()))
+                        editText.setSelection(editText.text.toString().length)
+                    }
+                }
+            })
+        }
+        editText.setLines(rows)
+        binding.miniAppFormContainer.addView(editText)
+        formViewCollection.add(FormViewComponent(editText, component))
+        Log.i("EditTextInputType", editText.inputType.toString() + "")
+    }
 
     private fun createSpinner(component: FormComponentItem, viewId: Int) {
 
@@ -121,10 +175,6 @@ class GenerateFormActivity : AppCompatActivity() {
     }
 
     private fun createRadioGroup(component: FormComponentItem, viewId: Int) {
-
-    }
-
-    private fun createEditableTextWithLabel(component: FormComponentItem, viewId: Int) {
 
     }
 

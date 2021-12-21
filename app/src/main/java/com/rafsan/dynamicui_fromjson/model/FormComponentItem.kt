@@ -10,6 +10,8 @@ data class FormComponentItem(
     val multiple: Boolean?,
     val name: String?,
     val value: String?,
+    val maxlength: String?,
+    val rows: String?,
     val other: Boolean?,
     val placeholder: String?,
     val required: Boolean?,

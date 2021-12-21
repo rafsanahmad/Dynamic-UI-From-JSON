@@ -17,5 +17,13 @@ class Utils {
             layoutParams.setMargins(40, topMergin, 40, 0)
             view.layoutParams = layoutParams
         }
+
+        fun method(str: String?): String? {
+            var str = str
+            if (str != null && str.isNotEmpty()) {
+                str = str.substring(0, str.length - 1)
+            }
+            return str
+        }
     }
 }
