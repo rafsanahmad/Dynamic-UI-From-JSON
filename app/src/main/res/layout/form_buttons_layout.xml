@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="60dp"
     android:layout_gravity="bottom"
-    android:padding="13dp">
+    android:padding="12dp">
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/btn_reset"
@@ -13,6 +13,7 @@
         android:layout_weight="1"
         android:background="@color/grey"
         android:text="@string/reset"
+        android:textAlignment="center"
         android:textColor="@color/white" />
 
     <androidx.appcompat.widget.AppCompatButton
@@ -23,5 +24,6 @@
         android:layout_weight="1"
         android:background="@color/teal_700"
         android:text="@string/submit"
+        android:textAlignment="center"
         android:textColor="@color/white" />
 </LinearLayout>

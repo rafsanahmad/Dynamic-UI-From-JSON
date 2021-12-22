@@ -167,5 +167,41 @@ class CollectData {
                 true
             }
         }
+
+        /**
+         * @param view
+         * @param FormComponentItem
+         * @return Boolean value to check required field fill up or not
+         */
+        fun getDataFromEditText(
+            view: View,
+            viewComponentModel: FormComponentItem
+        ): Boolean {
+            return true
+        }
+
+        /**
+         * @param view
+         * @param FormComponentItem
+         * @return
+         */
+        fun getDataFromRadioGroup(
+            view: View,
+            viewComponentModel: FormComponentItem
+        ): Boolean {
+            return true
+        }
+
+        /**
+         * @param view
+         * @param FormComponentItem
+         * @return
+         */
+        fun getDataFromSpinner(
+            view: View,
+            viewComponentModel: FormComponentItem
+        ): Boolean {
+            return true
+        }
     }
 }

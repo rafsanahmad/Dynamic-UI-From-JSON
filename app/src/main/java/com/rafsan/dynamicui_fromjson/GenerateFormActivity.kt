@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.app.DatePickerDialog
 import android.graphics.Color
 import android.graphics.Typeface
-import android.graphics.drawable.GradientDrawable
 import android.os.Build
 import android.os.Bundle
 import android.text.*
@@ -27,7 +26,11 @@ import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import com.rafsan.dynamicui_fromjson.data.CollectData.Companion.getDataFromCheckBoxGroup
 import com.rafsan.dynamicui_fromjson.data.CollectData.Companion.getDataFromDateTextView
+import com.rafsan.dynamicui_fromjson.data.CollectData.Companion.getDataFromEditText
+import com.rafsan.dynamicui_fromjson.data.CollectData.Companion.getDataFromRadioGroup
+import com.rafsan.dynamicui_fromjson.data.CollectData.Companion.getDataFromSpinner
 import com.rafsan.dynamicui_fromjson.databinding.ActivityGenerateFormBinding
+import com.rafsan.dynamicui_fromjson.databinding.FormButtonsLayoutBinding
 import com.rafsan.dynamicui_fromjson.model.FormComponent
 import com.rafsan.dynamicui_fromjson.model.FormComponentItem
 import com.rafsan.dynamicui_fromjson.model.FormViewComponent
@@ -836,29 +839,16 @@ class GenerateFormActivity : AppCompatActivity() {
     }
 
     private fun addSubmitButtonLayout() {
-        val layoutInflater = LayoutInflater.from(applicationContext)
-        val buttonView: View =
-            layoutInflater.inflate(R.layout.form_buttons_layout, null, false)
-        binding.miniAppFormContainer.addView(buttonView)
-
-        val submitButtonShape = GradientDrawable()
-        submitButtonShape.cornerRadius = 10f
-        submitButtonShape.setColor(ContextCompat.getColor(this, R.color.teal_700))
-
-        val resetButtonShape = GradientDrawable()
-        resetButtonShape.cornerRadius = 10f
-        resetButtonShape.setColor(ContextCompat.getColor(this, R.color.grey))
-        val btnReset = buttonView.findViewById<View>(R.id.btn_reset) as Button
-        val btnSubmit = buttonView.findViewById<View>(R.id.btn_submit) as Button
-        btnSubmit.background = submitButtonShape
-        btnReset.background = resetButtonShape
-
-        btnReset.setOnClickListener {
+        val layoutInflater = LayoutInflater.from(this)
+        val buttonViewBinding: FormButtonsLayoutBinding =
+            FormButtonsLayoutBinding.inflate(layoutInflater)
+        binding.miniAppFormContainer.addView(buttonViewBinding.root)
+        buttonViewBinding.btnReset.setOnClickListener {
             startActivity(intent)
             finish()
         }
 
-        btnSubmit.setOnClickListener {
+        buttonViewBinding.btnSubmit.setOnClickListener {
             for (formViewComponent in formViewCollection) {
                 val view: View = formViewComponent.createdView
                 val viewComponentModel: FormComponentItem =
@@ -867,18 +857,34 @@ class GenerateFormActivity : AppCompatActivity() {
                     "text" ->
                         if (!getDataFromEditText(view, viewComponentModel)) {
                             submitPropertyArrayJson = JsonArray()
+                        } else {
+                            viewComponentModel.label?.let { labelStr ->
+                                showRequiredDialog(labelStr)
+                            }
                         }
                     "textarea" ->
                         if (!getDataFromEditText(view, viewComponentModel)) {
                             submitPropertyArrayJson = JsonArray()
+                        } else {
+                            viewComponentModel.label?.let { labelStr ->
+                                showRequiredDialog(labelStr)
+                            }
                         }
                     "select" ->
                         if (!getDataFromSpinner(view, viewComponentModel)) {
                             submitPropertyArrayJson = JsonArray()
+                        } else {
+                            viewComponentModel.label?.let { labelStr ->
+                                showRequiredDialog(labelStr)
+                            }
                         }
                     "radio-group" ->
                         if (!getDataFromRadioGroup(view, viewComponentModel)) {
                             submitPropertyArrayJson = JsonArray()
+                        } else {
+                            viewComponentModel.label?.let { labelStr ->
+                                showRequiredDialog(labelStr)
+                            }
                         }
                     "date" -> getDataFromDateTextView(view, viewComponentModel)
                     "checkbox-group" ->
@@ -886,16 +892,16 @@ class GenerateFormActivity : AppCompatActivity() {
                             submitPropertyArrayJson = JsonArray()
                         } else {
                             viewComponentModel.label?.let { labelStr ->
-                                ShowDialog.customDialog(
-                                    this,
-                                    "Required",
-                                    labelStr, null
-                                )
+                                showRequiredDialog(labelStr)
                             }
                         }
                     "number" -> {
                         if (!getDataFromEditText(view, viewComponentModel)) {
                             submitPropertyArrayJson = JsonArray()
+                        } else {
+                            viewComponentModel.label?.let { labelStr ->
+                                showRequiredDialog(labelStr)
+                            }
                         }
                     }
                 }
@@ -904,6 +910,14 @@ class GenerateFormActivity : AppCompatActivity() {
             submitRootJsonObj?.add("properties", submitPropertyArrayJson)
             Log.i("JsonArray", submitRootJsonObj.toString())
         }
+    }
+
+    private fun showRequiredDialog(labelStr: String) {
+        ShowDialog.customDialog(
+            this,
+            "Required",
+            labelStr, null
+        )
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
