@@ -23,6 +23,7 @@ import androidx.appcompat.widget.AppCompatRadioButton
 import androidx.appcompat.widget.LinearLayoutCompat
 import androidx.appcompat.widget.SwitchCompat
 import androidx.core.app.NavUtils
+import androidx.core.content.ContextCompat
 import com.google.gson.Gson
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
@@ -379,7 +380,157 @@ class GenerateFormActivity : AppCompatActivity() {
     }
 
     private fun createNumberEditText(component: FormComponentItem) {
+        var minValue = 0
+        var maxValue = Int.MAX_VALUE
+        var step = 1
+        component.min?.let {
+            minValue = it
+        }
+        component.max?.let {
+            maxValue = it
+        }
+        component.step?.let {
+            step = it
+        }
+        val finalStep = step
+        val finalMinValue = minValue
+        val finalMaxValue = maxValue
 
+        isLabelNull(component)
+        val numberViewContainer = LinearLayout(this)
+        val layoutParams = LinearLayout.LayoutParams(
+            LinearLayout.LayoutParams.MATCH_PARENT,
+            LinearLayout.LayoutParams.WRAP_CONTENT
+        )
+        numberViewContainer.setPadding(40, 10, 10, 10)
+        numberViewContainer.layoutParams = layoutParams
+
+        val editTextParam = LinearLayout.LayoutParams(
+            0,
+            LinearLayout.LayoutParams.WRAP_CONTENT
+        )
+        editTextParam.weight = 5f
+        editTextParam.setMargins(0, 0, 20, 0)
+        val editText = EditText(this)
+        editText.layoutParams = editTextParam
+        editText.setPadding(10, 10, 10, 10)
+        editText.inputType = InputType.TYPE_CLASS_NUMBER
+        editText.setBackgroundResource(R.drawable.edit_text_background)
+        component.placeholder?.let {
+            editText.hint = it
+        }
+
+        editText.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
+                if (s.length > 1) {
+                    if (finalMaxValue != 0) {
+                        if (s.toString().toInt() > finalMaxValue) {
+                            editText.setText(finalMaxValue.toString())
+                        }
+                    }
+                    if (finalMinValue != 0) {
+                        if (s.toString().toInt() < finalMinValue) {
+                            editText.setText(finalMinValue.toString())
+                        }
+                    }
+                }
+            }
+
+            override fun afterTextChanged(s: Editable) {
+            }
+        })
+
+        isValueNull(component, editText)
+        if (component.value == null) {
+            if (component.min != null) {
+                editText.setText(component.min)
+            } else if (component.max != null) {
+                editText.setText(component.max)
+            }
+        }
+        isSubTypeNull(component, editText)
+        isPlaceHolderNull(component, editText)
+
+        component.maxlength?.let {
+            editText.filters = arrayOf<InputFilter>(LengthFilter(it.toInt()))
+        }
+
+        val textParams = LinearLayout.LayoutParams(
+            0,
+            LinearLayout.LayoutParams.MATCH_PARENT
+        )
+        textParams.weight = 1f
+        textParams.setMargins(10, 0, 5, 0)
+        val negativeButton = TextView(this)
+        negativeButton.isAllCaps = false
+        negativeButton.text = "-"
+        negativeButton.gravity = Gravity.CENTER
+        negativeButton.setTextColor(Color.parseColor("#000000"))
+        negativeButton.layoutParams = textParams
+        negativeButton.setBackgroundColor(ContextCompat.getColor(this, R.color.teal_500))
+
+        val positiveButton = TextView(this)
+        positiveButton.isAllCaps = false
+        positiveButton.text = "+"
+        positiveButton.gravity = Gravity.CENTER
+        positiveButton.setTextColor(Color.parseColor("#000000"))
+        positiveButton.layoutParams = textParams
+        positiveButton.setBackgroundColor(ContextCompat.getColor(this, R.color.teal_500))
+
+        //ClickListener for negative button
+        negativeButton.setOnClickListener { v: View? ->
+            var editTextNumber = 0
+            if (editText.text.toString() != "") {
+                editTextNumber = editText.text.toString().toInt()
+            }
+            Log.i("NumberFiledValue", editTextNumber.toString())
+            if (finalStep == 0) {
+                if (editTextNumber == finalMinValue) {
+                    editText.setText(finalMaxValue.toString())
+                } else {
+                    editTextNumber--
+                    editText.setText(editTextNumber.toString())
+                }
+            } else {
+                if (editTextNumber == finalMinValue || editTextNumber - finalStep < finalMinValue) {
+                    editText.setText(finalMaxValue.toString())
+                } else {
+                    editTextNumber -= finalStep
+                    editText.setText(editTextNumber.toString())
+                }
+            }
+        }
+
+        //ClickListener for positive button
+        positiveButton.setOnClickListener { v: View? ->
+            var editTextNumber = 0
+            if (editText.text.toString() != "") {
+                editTextNumber = editText.text.toString().toInt()
+            }
+            Log.i("NumberFieldValue", editTextNumber.toString())
+            if (finalStep == 0) {
+                if (editTextNumber == finalMaxValue) {
+                    editText.setText(finalMinValue.toString())
+                } else {
+                    editTextNumber++
+                    editText.setText(editTextNumber.toString())
+                }
+            } else {
+                if (editTextNumber == finalMaxValue || editTextNumber + finalStep > finalMaxValue) {
+                    editText.setText(finalMinValue.toString())
+                } else {
+                    editTextNumber += finalStep
+                    editText.setText(editTextNumber.toString())
+                }
+            }
+        }
+
+        numberViewContainer.addView(editText)
+        numberViewContainer.addView(negativeButton)
+        numberViewContainer.addView(positiveButton)
+        binding.miniAppFormContainer.addView(numberViewContainer)
+        formViewCollection.add(FormViewComponent(editText, component))
     }
 
     @SuppressLint("RestrictedApi")
