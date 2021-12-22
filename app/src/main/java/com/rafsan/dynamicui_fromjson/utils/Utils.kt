@@ -15,6 +15,7 @@ import com.rafsan.dynamicui_fromjson.R
 import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.*
+import java.util.regex.Pattern
 
 class Utils {
     companion object {
@@ -117,6 +118,17 @@ class Utils {
                     )
                 )
             )
+        }
+
+        fun isValidEmailAddress(emailAddress: String): Boolean {
+            val emailPattern = "[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,64}"
+            val p = Pattern.compile(emailPattern)
+            val m = p.matcher(emailAddress)
+            return m.matches()
+        }
+
+        fun isValidTelephoneNumber(telephoneNumber: String): Boolean {
+            return telephoneNumber.length >= 10
         }
     }
 }

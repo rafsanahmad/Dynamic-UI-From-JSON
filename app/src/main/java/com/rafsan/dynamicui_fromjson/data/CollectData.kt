@@ -8,6 +8,8 @@ import com.google.gson.JsonObject
 import com.rafsan.dynamicui_fromjson.GenerateFormActivity.Companion.submitPropertyArrayJson
 import com.rafsan.dynamicui_fromjson.model.FormComponentItem
 import com.rafsan.dynamicui_fromjson.model.Value
+import com.rafsan.dynamicui_fromjson.utils.Utils.Companion.isValidEmailAddress
+import com.rafsan.dynamicui_fromjson.utils.Utils.Companion.isValidTelephoneNumber
 
 class CollectData {
     companion object {
@@ -177,6 +179,49 @@ class CollectData {
             view: View,
             viewComponentModel: FormComponentItem
         ): Boolean {
+            val editText = view as EditText
+            val submitPropertiesValueObj = JsonObject()
+            if (editText.text.toString() != "") {
+                viewComponentModel.required?.let {
+                    //Not null
+                    if (it) {
+                        if (editText.text.toString() == "") {
+                            return false
+                        } else {
+                            viewComponentModel.subtype?.let { subType ->
+                                if (subType.equals("tel")) {
+                                    if (!isValidTelephoneNumber(editText.text.toString())) {
+                                        return false
+                                    }
+                                } else if (subType.equals("email")) {
+                                    if (!isValidEmailAddress(editText.text.toString())) {
+                                        return false
+                                    }
+                                }
+                            }
+                        }
+                        submitPropertiesValueObj.addProperty(
+                            "label",
+                            viewComponentModel.label
+                        )
+                        submitPropertiesValueObj.addProperty("value", editText.text.toString())
+                        submitPropertiesValueObj.addProperty(
+                            "type",
+                            viewComponentModel.type
+                        )
+                        submitPropertiesValueObj.addProperty(
+                            "subtype",
+                            viewComponentModel.subtype
+                        )
+                        submitPropertyArrayJson!!.add(submitPropertiesValueObj)
+                    }
+                }
+                submitPropertiesValueObj.addProperty("label", viewComponentModel.label)
+                submitPropertiesValueObj.addProperty("value", editText.text.toString())
+                submitPropertiesValueObj.addProperty("type", viewComponentModel.type)
+                submitPropertiesValueObj.addProperty("subtype", viewComponentModel.subtype)
+                submitPropertyArrayJson!!.add(submitPropertiesValueObj)
+            }
             return true
         }
 
