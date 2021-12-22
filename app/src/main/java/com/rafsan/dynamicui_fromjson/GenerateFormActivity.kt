@@ -22,10 +22,11 @@ import androidx.appcompat.widget.LinearLayoutCompat
 import androidx.appcompat.widget.SwitchCompat
 import androidx.core.app.NavUtils
 import androidx.core.content.ContextCompat
-import androidx.core.content.res.ResourcesCompat
 import com.google.gson.Gson
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
+import com.rafsan.dynamicui_fromjson.data.CollectData.Companion.getDataFromCheckBoxGroup
+import com.rafsan.dynamicui_fromjson.data.CollectData.Companion.getDataFromDateTextView
 import com.rafsan.dynamicui_fromjson.databinding.ActivityGenerateFormBinding
 import com.rafsan.dynamicui_fromjson.model.FormComponent
 import com.rafsan.dynamicui_fromjson.model.FormComponentItem
@@ -39,6 +40,7 @@ import com.rafsan.dynamicui_fromjson.utils.Utils.Companion.getDateStringToShow
 import com.rafsan.dynamicui_fromjson.utils.Utils.Companion.method
 import com.rafsan.dynamicui_fromjson.utils.Utils.Companion.setMerginToviews
 import com.rafsan.dynamicui_fromjson.utils.Utils.Companion.setSwitchColor
+import com.rafsan.dynamicui_fromjson.utils.dialog.ShowDialog
 import java.util.*
 
 class GenerateFormActivity : AppCompatActivity() {
@@ -862,22 +864,35 @@ class GenerateFormActivity : AppCompatActivity() {
                 val viewComponentModel: FormComponentItem =
                     formViewComponent.getViewComponentModel()
                 when (viewComponentModel.type) {
-                    "text" -> if (!getDataFromEditText(view, viewComponentModel)) {
-                        submitPropertyArrayJson = JsonArray()
-                    }
-                    "textarea" -> if (!getDataFromEditText(view, viewComponentModel)) {
-                        submitPropertyArrayJson = JsonArray()
-                    }
-                    "select" -> if (!getDataFromSpinner(view, viewComponentModel)) {
-                        submitPropertyArrayJson = JsonArray()
-                    }
-                    "radio-group" -> if (!getDataFromRadioGroup(view, viewComponentModel)) {
-                        submitPropertyArrayJson = JsonArray()
-                    }
+                    "text" ->
+                        if (!getDataFromEditText(view, viewComponentModel)) {
+                            submitPropertyArrayJson = JsonArray()
+                        }
+                    "textarea" ->
+                        if (!getDataFromEditText(view, viewComponentModel)) {
+                            submitPropertyArrayJson = JsonArray()
+                        }
+                    "select" ->
+                        if (!getDataFromSpinner(view, viewComponentModel)) {
+                            submitPropertyArrayJson = JsonArray()
+                        }
+                    "radio-group" ->
+                        if (!getDataFromRadioGroup(view, viewComponentModel)) {
+                            submitPropertyArrayJson = JsonArray()
+                        }
                     "date" -> getDataFromDateTextView(view, viewComponentModel)
-                    "checkbox-group" -> if (!getDataFromCheckBoxGroup(view, viewComponentModel)) {
-                        submitPropertyArrayJson = JsonArray()
-                    }
+                    "checkbox-group" ->
+                        if (!getDataFromCheckBoxGroup(view, viewComponentModel)) {
+                            submitPropertyArrayJson = JsonArray()
+                        } else {
+                            viewComponentModel.label?.let { labelStr ->
+                                ShowDialog.customDialog(
+                                    this,
+                                    "Required",
+                                    labelStr, null
+                                )
+                            }
+                        }
                     "number" -> {
                         if (!getDataFromEditText(view, viewComponentModel)) {
                             submitPropertyArrayJson = JsonArray()

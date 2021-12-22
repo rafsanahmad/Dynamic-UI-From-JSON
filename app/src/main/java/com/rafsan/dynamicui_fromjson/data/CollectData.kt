@@ -1,7 +1,5 @@
-package com.rafsan.dynamicui_fromjson
+package com.rafsan.dynamicui_fromjson.data
 
-import android.content.res.Resources
-import android.util.Log
 import android.view.View
 import android.widget.*
 import androidx.appcompat.widget.SwitchCompat
@@ -10,7 +8,6 @@ import com.google.gson.JsonObject
 import com.rafsan.dynamicui_fromjson.GenerateFormActivity.Companion.submitPropertyArrayJson
 import com.rafsan.dynamicui_fromjson.model.FormComponentItem
 import com.rafsan.dynamicui_fromjson.model.Value
-import java.util.ArrayList
 
 class CollectData {
     companion object {
@@ -20,7 +17,7 @@ class CollectData {
          * @param view
          * @param FormComponentItem
          */
-        private fun getDataFromDateTextView(
+        fun getDataFromDateTextView(
             view: View,
             viewComponentModel: FormComponentItem
         ) {
@@ -29,8 +26,8 @@ class CollectData {
             submitPropertiesValueObj.addProperty("label", viewComponentModel.label)
             submitPropertiesValueObj.addProperty("value", dateView.text.toString())
             submitPropertiesValueObj.addProperty("type", viewComponentModel.type)
-            submitPropertiesValueObj.addProperty("subtype", viewComponentModel.subtype))
-            submitPropertyArrayJson.add(submitPropertiesValueObj)
+            submitPropertiesValueObj.addProperty("subtype", viewComponentModel.subtype)
+            submitPropertyArrayJson?.add(submitPropertiesValueObj)
         }
 
         /**
@@ -38,7 +35,7 @@ class CollectData {
          * @param FormComponentItem
          * @return
          */
-        private fun getDataFromCheckBoxGroup(
+        fun getDataFromCheckBoxGroup(
             view: View,
             viewComponentModel: FormComponentItem
         ): Boolean {
@@ -52,7 +49,7 @@ class CollectData {
          * @param FormComponentItem
          * @return
          */
-        private fun getDataFromCheckBoxContainer(
+        fun getDataFromCheckBoxContainer(
             view: View,
             viewComponentModel: FormComponentItem
         ): Boolean {
@@ -60,7 +57,31 @@ class CollectData {
             val submitJsonValues = JsonArray()
             val submitPropertiesValueObj = JsonObject()
             var valueModel: Value?
+            var isChecked = false
             return if (viewComponentModel.required != null && viewComponentModel.required) {
+                for (i in 0 until checkBoxContainer.childCount) {
+                    val submitJsonValue = JsonObject()
+                    val checkBox = checkBoxContainer.getChildAt(i) as CheckBox
+                    valueModel = viewComponentModel.values?.get(i)
+                    if (checkBox.isChecked) {
+                        submitJsonValue.addProperty("label", checkBox.text.toString())
+                        //submitJsonValue.addProperty("value", valueModel.getValue());
+                        if (valueModel != null) {
+                            if (valueModel.label.equals("Other")) {
+                                submitJsonValue.addProperty("value", valueModel.value)
+                            } else submitJsonValue.addProperty("value", checkBox.text.toString())
+                        }
+                        submitJsonValues.add(submitJsonValue)
+                        isChecked = true
+                    }
+                }
+                submitPropertiesValueObj.addProperty("label", viewComponentModel.label)
+                submitPropertiesValueObj.add("value", submitJsonValues)
+                submitPropertiesValueObj.addProperty("type", viewComponentModel.type)
+                submitPropertiesValueObj.addProperty("subtype", viewComponentModel.subtype)
+                submitPropertyArrayJson?.add(submitPropertiesValueObj)
+                return isChecked
+            } else {
                 for (i in 0 until checkBoxContainer.childCount) {
                     val submitJsonValue = JsonObject()
                     val checkBox = checkBoxContainer.getChildAt(i) as CheckBox
@@ -82,18 +103,58 @@ class CollectData {
                 submitPropertiesValueObj.addProperty("subtype", viewComponentModel.subtype)
                 submitPropertyArrayJson?.add(submitPropertiesValueObj)
                 true
-            } else {
-                for (i in 0 until checkBoxContainer.childCount) {
+            }
+        }
+
+        /**
+         * @param view
+         * @param FormComponentItem
+         * @return
+         */
+        fun getDataFromSwitchContainer(
+            view: View,
+            viewComponentModel: FormComponentItem
+        ): Boolean {
+            val checkBoxContainer = view as LinearLayout
+            val submitJsonValues = JsonArray()
+            val submitPropertiesValueObj = JsonObject()
+            var valueModel: Value?
+            var isChecked = false
+            return if (viewComponentModel.required != null && viewComponentModel.required) {
+                for (i in 0 until (viewComponentModel.values?.size ?: 0)) {
                     val submitJsonValue = JsonObject()
-                    val checkBox = checkBoxContainer.getChildAt(i) as CheckBox
+                    val aSwitch = checkBoxContainer.getChildAt(i) as SwitchCompat
                     valueModel = viewComponentModel.values?.get(i)
-                    if (checkBox.isChecked) {
-                        submitJsonValue.addProperty("label", checkBox.text.toString())
+                    if (aSwitch.isChecked) {
+                        submitJsonValue.addProperty("label", aSwitch.text.toString())
                         //submitJsonValue.addProperty("value", valueModel.getValue());
                         if (valueModel != null) {
                             if (valueModel.label.equals("Other")) {
                                 submitJsonValue.addProperty("value", valueModel.value)
-                            } else submitJsonValue.addProperty("value", checkBox.text.toString())
+                            } else submitJsonValue.addProperty("value", aSwitch.text.toString())
+                        }
+                        submitJsonValues.add(submitJsonValue)
+                        isChecked = true
+                    }
+                }
+                submitPropertiesValueObj.addProperty("label", viewComponentModel.label)
+                submitPropertiesValueObj.add("value", submitJsonValues)
+                submitPropertiesValueObj.addProperty("type", viewComponentModel.type)
+                submitPropertiesValueObj.addProperty("subtype", viewComponentModel.subtype)
+                submitPropertyArrayJson?.add(submitPropertiesValueObj)
+                return isChecked
+            } else {
+                for (i in 0 until (viewComponentModel.values?.size ?: 0)) {
+                    val submitJsonValue = JsonObject()
+                    val aSwitch = checkBoxContainer.getChildAt(i) as SwitchCompat
+                    valueModel = viewComponentModel.values?.get(i)
+                    if (aSwitch.isChecked) {
+                        submitJsonValue.addProperty("label", aSwitch.text.toString())
+                        //submitJsonValue.addProperty("value", valueModel.getValue());
+                        if (valueModel != null) {
+                            if (valueModel.label.equals("Other")) {
+                                submitJsonValue.addProperty("value", valueModel.value)
+                            } else submitJsonValue.addProperty("value", aSwitch.text.toString())
                         }
                         submitJsonValues.add(submitJsonValue)
                     }
