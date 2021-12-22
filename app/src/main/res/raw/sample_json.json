@@ -142,5 +142,155 @@
     "name": "button-1640082377047-0",
     "access": false,
     "style": "default"
-  }
+  },
+  {
+      "type": "number",
+      "required": false,
+      "label": "Phone Number",
+      "placeholder": "Enter your phone number",
+      "className": "form-control",
+      "name": "number-1640159009641-0",
+      "access": false,
+      "min": 100,
+      "max": 999999999999,
+      "step": 1
+    },
+    {
+      "type": "date",
+      "required": false,
+      "label": "Date of Birth",
+      "className": "form-control",
+      "name": "date-1640160922288-0",
+      "access": false
+    },
+    {
+      "type": "text",
+      "required": false,
+      "label": "Educational Institution",
+      "placeholder": "Enter your school name",
+      "className": "form-control",
+      "name": "text-1640160946355-0",
+      "access": false,
+      "subtype": "text",
+      "maxlength": 200
+    },
+    {
+      "type": "paragraph",
+      "subtype": "blockquote",
+      "label": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.<br>",
+      "access": false
+    },
+    {
+      "type": "textarea",
+      "required": false,
+      "label": "Add your hobbies",
+      "className": "form-control",
+      "name": "textarea-1640160857581-0",
+      "access": false,
+      "subtype": "textarea",
+      "rows": 8
+    },
+    {
+      "type": "checkbox-group",
+      "required": false,
+      "label": "Your Preferences",
+      "toggle": true,
+      "inline": false,
+      "name": "checkbox-group-1640161076154-0",
+      "access": false,
+      "other": true,
+      "values": [
+        {
+          "label": "Array",
+          "value": "option-1",
+          "selected": true
+        },
+        {
+          "label": "LinkedList",
+          "value": "2",
+          "selected": false
+        },
+        {
+          "label": "Tree",
+          "value": "3",
+          "selected": false
+        },
+        {
+          "label": "Map",
+          "value": "4",
+          "selected": false
+        },
+        {
+          "label": "Graph",
+          "value": "5",
+          "selected": false
+        },
+        {
+          "label": "Tree",
+          "value": "6",
+          "selected": false
+        },
+        {
+          "label": "ArrayList",
+          "value": "7",
+          "selected": false
+        },
+        {
+          "label": "Hashing",
+          "value": "8",
+          "selected": false
+        }
+      ]
+    },
+    {
+      "type": "radio-group",
+      "required": false,
+      "label": "Your choice of department",
+      "inline": false,
+      "name": "radio-group-1640160977822-0",
+      "access": false,
+      "other": false,
+      "values": [
+        {
+          "label": "Engineering",
+          "value": "option-1",
+          "selected": false
+        },
+        {
+          "label": "Marketting",
+          "value": "option-2",
+          "selected": false
+        },
+        {
+          "label": "Management",
+          "value": "option-3",
+          "selected": false
+        },
+        {
+          "label": "Finance",
+          "value": "ew",
+          "selected": false
+        },
+        {
+          "label": "Technology",
+          "value": "aa",
+          "selected": false
+        },
+        {
+          "label": "Arts & Literature",
+          "value": "aw",
+          "selected": false
+        },
+        {
+          "label": "Business Management",
+          "value": "rr",
+          "selected": false
+        },
+        {
+          "label": "Law",
+          "value": "qq",
+          "selected": false
+        }
+      ]
+    }
 ]

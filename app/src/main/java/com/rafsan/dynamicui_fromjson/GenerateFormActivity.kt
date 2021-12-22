@@ -50,6 +50,7 @@ class GenerateFormActivity : AppCompatActivity() {
     var submitRootJsonObj: JsonObject? = null
     var submitPropertyArrayJson: JsonArray? = null
     var formComponent: FormComponent? = null
+    val textColor = Color.parseColor("#000000")
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -67,7 +68,7 @@ class GenerateFormActivity : AppCompatActivity() {
     private fun populateForm(json: String) {
         formComponent = Gson().fromJson(json, FormComponent::class.java)
         var viewId = 1
-        binding.miniAppFormContainer.setVisibility(View.VISIBLE)
+        binding.miniAppFormContainer.visibility = View.VISIBLE
 
         //TODO:- GENERATE FORM LAYOUT
         formComponent?.let {
@@ -99,14 +100,14 @@ class GenerateFormActivity : AppCompatActivity() {
             "h3" -> txtHeader.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16f)
         }
         componentItem.label?.let {
-            txtHeader.setText(Utils.fromHtml(it))
+            txtHeader.text = Utils.fromHtml(it)
         }
 
         txtHeader.layoutParams = LinearLayoutCompat.LayoutParams(
             ViewGroup.LayoutParams.MATCH_PARENT,
             ViewGroup.LayoutParams.WRAP_CONTENT
         )
-        txtHeader.setTextColor(Color.parseColor("#000000"))
+        txtHeader.setTextColor(textColor)
         txtHeader.setPadding(0, 15, 0, 15)
         txtHeader.gravity = Gravity.CENTER
         return txtHeader
@@ -131,8 +132,7 @@ class GenerateFormActivity : AppCompatActivity() {
         isSubTypeNull(component, editText)
         isPlaceHolderNull(component, editText)
         component.maxlength?.let {
-            editText.filters =
-                arrayOf<InputFilter>(LengthFilter(it.toInt()))
+            editText.filters = arrayOf<InputFilter>(LengthFilter(it.toInt()))
         }
 
         component.rows?.let {
@@ -214,7 +214,7 @@ class GenerateFormActivity : AppCompatActivity() {
             for (i in it.indices) {
                 val value = it[i]
                 val radioButton = AppCompatRadioButton(this)
-                radioButton.setText(value.label)
+                radioButton.text = value.label
                 radioButton.supportButtonTintList = getCustomColorStateList(this)
 
                 value.selected?.let { selected ->
@@ -228,13 +228,13 @@ class GenerateFormActivity : AppCompatActivity() {
             if (component.toggle != null && component.toggle) {
                 val radioGroupContainer = RelativeLayout(this)
                 var valueModels: MutableList<Value> = mutableListOf()
-                component.values.let {
-                    valueModels = it as MutableList<Value>
+                component.values.let { options ->
+                    valueModels = options as MutableList<Value>
                 }
                 val valueModel = Value("Other", null, null)
                 valueModels.add(valueModel)
                 val radioButton = AppCompatRadioButton(this)
-                radioButton.setText(valueModel.label)
+                radioButton.text = valueModel.label
                 radioButton.supportButtonTintList = getCustomColorStateList(this)
                 radioGroup.addView(radioButton)
                 radioGroupContainer.addView(radioGroup)
@@ -303,7 +303,7 @@ class GenerateFormActivity : AppCompatActivity() {
             } else textView.text = Html.fromHtml(paragraphText)
         }
 
-        textView.setTextColor(Color.parseColor("#000000"))
+        textView.setTextColor(textColor)
         setMerginToviews(textView)
         textView.setPadding(0, 10, 0, 10)
         binding.miniAppFormContainer.addView(textView)
@@ -325,7 +325,7 @@ class GenerateFormActivity : AppCompatActivity() {
             textView.setTypeface(null, Typeface.BOLD)
             component.required?.let { required ->
                 if (required) {
-                    textView.setText(labelStringForRequiredField(labelString))
+                    textView.text = labelStringForRequiredField(labelString)
                 } else {
                     textView.text = createStringForViewLabel(false, labelString)
                 }
@@ -361,7 +361,7 @@ class GenerateFormActivity : AppCompatActivity() {
                     { view, year, month, dayOfMonth ->
                         val selectedDate = Calendar.getInstance()
                         selectedDate[year, month] = dayOfMonth
-                        txtDate.setText(getDateStringToShow(selectedDate.time, "MMMM d, yyyy"))
+                        txtDate.text = getDateStringToShow(selectedDate.time, "MMMM d, yyyy")
                     }, calendar[Calendar.YEAR], calendar[Calendar.MONTH],
                     calendar[Calendar.DAY_OF_MONTH]
                 )
@@ -381,7 +381,7 @@ class GenerateFormActivity : AppCompatActivity() {
 
     private fun createNumberEditText(component: FormComponentItem) {
         var minValue = 0
-        var maxValue = Int.MAX_VALUE
+        var maxValue = 0L
         var step = 1
         component.min?.let {
             minValue = it
@@ -424,13 +424,13 @@ class GenerateFormActivity : AppCompatActivity() {
             override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
                 if (s.length > 1) {
-                    if (finalMaxValue != 0) {
-                        if (s.toString().toInt() > finalMaxValue) {
+                    if (finalMaxValue != 0L) {
+                        if (s.toString().toLong() > finalMaxValue) {
                             editText.setText(finalMaxValue.toString())
                         }
                     }
                     if (finalMinValue != 0) {
-                        if (s.toString().toInt() < finalMinValue) {
+                        if (s.toString().toLong() < finalMinValue) {
                             editText.setText(finalMinValue.toString())
                         }
                     }
@@ -442,13 +442,7 @@ class GenerateFormActivity : AppCompatActivity() {
         })
 
         isValueNull(component, editText)
-        if (component.value == null) {
-            if (component.min != null) {
-                editText.setText(component.min)
-            } else if (component.max != null) {
-                editText.setText(component.max)
-            }
-        }
+        editText.setText(minValue.toString())
         isSubTypeNull(component, editText)
         isPlaceHolderNull(component, editText)
 
@@ -466,7 +460,7 @@ class GenerateFormActivity : AppCompatActivity() {
         negativeButton.isAllCaps = false
         negativeButton.text = "-"
         negativeButton.gravity = Gravity.CENTER
-        negativeButton.setTextColor(Color.parseColor("#000000"))
+        negativeButton.setTextColor(textColor)
         negativeButton.layoutParams = textParams
         negativeButton.setBackgroundColor(ContextCompat.getColor(this, R.color.teal_500))
 
@@ -474,7 +468,7 @@ class GenerateFormActivity : AppCompatActivity() {
         positiveButton.isAllCaps = false
         positiveButton.text = "+"
         positiveButton.gravity = Gravity.CENTER
-        positiveButton.setTextColor(Color.parseColor("#000000"))
+        positiveButton.setTextColor(textColor)
         positiveButton.layoutParams = textParams
         positiveButton.setBackgroundColor(ContextCompat.getColor(this, R.color.teal_500))
 
@@ -504,9 +498,9 @@ class GenerateFormActivity : AppCompatActivity() {
 
         //ClickListener for positive button
         positiveButton.setOnClickListener { v: View? ->
-            var editTextNumber = 0
+            var editTextNumber = 0L
             if (editText.text.toString() != "") {
-                editTextNumber = editText.text.toString().toInt()
+                editTextNumber = editText.text.toString().toLong()
             }
             Log.i("NumberFieldValue", editTextNumber.toString())
             if (finalStep == 0) {
@@ -547,7 +541,7 @@ class GenerateFormActivity : AppCompatActivity() {
             for (i in it.indices) {
                 val valueModel = it[i]
                 val checkBox = AppCompatCheckBox(this)
-                checkBox.setText(valueModel.label)
+                checkBox.text = valueModel.label
                 val layoutParams1 = LinearLayout.LayoutParams(
                     LinearLayout.LayoutParams.MATCH_PARENT,
                     LinearLayout.LayoutParams.WRAP_CONTENT
@@ -565,13 +559,13 @@ class GenerateFormActivity : AppCompatActivity() {
             if (component.toggle != null && component.toggle) {
                 val rootContainer = RelativeLayout(this)
                 var valueModels: MutableList<Value> = mutableListOf()
-                component.values.let {
-                    valueModels = it as MutableList<Value>
+                component.values.let { options ->
+                    valueModels = options as MutableList<Value>
                 }
                 val valueModel = Value("Other", null, null)
                 valueModels.add(valueModel)
                 val checkBox = AppCompatCheckBox(this)
-                checkBox.setText(valueModel.label)
+                checkBox.text = valueModel.label
                 setMerginToviews(
                     checkBox, 20,
                     LinearLayout.LayoutParams.MATCH_PARENT,
@@ -645,7 +639,7 @@ class GenerateFormActivity : AppCompatActivity() {
             for (i in it.indices) {
                 val valueModel = it[i]
                 val mySwitch = SwitchCompat(this)
-                mySwitch.setText(valueModel.label)
+                mySwitch.text = valueModel.label
                 val layoutParams1 = LinearLayout.LayoutParams(
                     LinearLayout.LayoutParams.MATCH_PARENT,
                     LinearLayout.LayoutParams.WRAP_CONTENT
@@ -666,7 +660,7 @@ class GenerateFormActivity : AppCompatActivity() {
                 val valueModel = Value("Other", null, null)
                 valueModels.add(valueModel)
                 val mySwitch = SwitchCompat(this)
-                mySwitch.setText(valueModel.label)
+                mySwitch.text = valueModel.label
                 val layoutParams1 = LinearLayout.LayoutParams(
                     LinearLayout.LayoutParams.MATCH_PARENT,
                     LinearLayout.LayoutParams.WRAP_CONTENT
@@ -738,7 +732,7 @@ class GenerateFormActivity : AppCompatActivity() {
         viewComponentModel: FormComponentItem,
         editText: EditText
     ) {
-        if (viewComponentModel.placeholder != null) editText.setHint(viewComponentModel.placeholder)
+        if (viewComponentModel.placeholder != null) editText.hint = viewComponentModel.placeholder
     }
 
     private fun isValueNull(viewComponentModel: FormComponentItem, view: TextView) {
@@ -762,7 +756,7 @@ class GenerateFormActivity : AppCompatActivity() {
                 if (it) {
                     label.text = createStringForViewLabel(it, labelText)
                 } else {
-                    label.setText(createStringForViewLabel(false, labelText))
+                    label.text = createStringForViewLabel(false, labelText)
                 }
             }
             binding.miniAppFormContainer.addView(label)
@@ -788,7 +782,7 @@ class GenerateFormActivity : AppCompatActivity() {
     private fun createStringForViewLabel(
         required: Boolean,
         label: String
-    ): SpannableStringBuilder? {
+    ): SpannableStringBuilder {
         val labelStr = Utils.fromHtml(label)
         return if (required) {
             labelStringForRequiredField(labelStr)
@@ -800,7 +794,7 @@ class GenerateFormActivity : AppCompatActivity() {
                 Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
             )
             username.setSpan(
-                ForegroundColorSpan(Color.parseColor("#000000")), 0, username.length,
+                ForegroundColorSpan(textColor), 0, username.length,
                 Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
             )
             description.append(username)
@@ -808,7 +802,7 @@ class GenerateFormActivity : AppCompatActivity() {
         }
     }
 
-    private fun labelStringForRequiredField(label: String): SpannableStringBuilder? {
+    private fun labelStringForRequiredField(label: String): SpannableStringBuilder {
         val username = SpannableString(label)
         val description = SpannableStringBuilder()
         username.setSpan(
@@ -816,7 +810,7 @@ class GenerateFormActivity : AppCompatActivity() {
             Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
         )
         username.setSpan(
-            ForegroundColorSpan(Color.parseColor("#000000")), 0, username.length,
+            ForegroundColorSpan(textColor), 0, username.length,
             Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
         )
         description.append(username)

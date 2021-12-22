@@ -5,7 +5,7 @@ data class FormComponentItem(
     val className: String,
     val `inline`: Boolean,
     val label: String?,
-    val max: Int?,
+    val max: Long?,
     val min: Int?,
     val step: Int?,
     val multiple: Boolean?,
