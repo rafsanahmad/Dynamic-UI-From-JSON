@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.app.DatePickerDialog
 import android.graphics.Color
 import android.graphics.Typeface
+import android.graphics.drawable.GradientDrawable
 import android.os.Build
 import android.os.Bundle
 import android.text.*
@@ -12,10 +13,7 @@ import android.text.style.ForegroundColorSpan
 import android.text.style.RelativeSizeSpan
 import android.util.Log
 import android.util.TypedValue
-import android.view.Gravity
-import android.view.MenuItem
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.AppCompatCheckBox
@@ -24,6 +22,7 @@ import androidx.appcompat.widget.LinearLayoutCompat
 import androidx.appcompat.widget.SwitchCompat
 import androidx.core.app.NavUtils
 import androidx.core.content.ContextCompat
+import androidx.core.content.res.ResourcesCompat
 import com.google.gson.Gson
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
@@ -90,6 +89,7 @@ class GenerateFormActivity : AppCompatActivity() {
                 }
             }
         }
+        addSubmitButtonLayout()
     }
 
     private fun createHeaderView(componentItem: FormComponentItem): TextView {
@@ -827,6 +827,64 @@ class GenerateFormActivity : AppCompatActivity() {
         )
         description.append(commentSpannable)
         return description
+    }
+
+    private fun addSubmitButtonLayout() {
+        val layoutInflater = LayoutInflater.from(applicationContext)
+        val buttonView: View =
+            layoutInflater.inflate(R.layout.form_buttons_layout, null, false)
+        binding.miniAppFormContainer.addView(buttonView)
+
+        val submitButtonShape = GradientDrawable()
+        submitButtonShape.cornerRadius = 10f
+        submitButtonShape.setColor(ContextCompat.getColor(this, R.color.teal_700))
+
+        val resetButtonShape = GradientDrawable()
+        resetButtonShape.cornerRadius = 10f
+        resetButtonShape.setColor(ContextCompat.getColor(this, R.color.grey))
+        val btnReset = buttonView.findViewById<View>(R.id.btn_reset) as Button
+        val btnSubmit = buttonView.findViewById<View>(R.id.btn_submit) as Button
+        btnSubmit.background = submitButtonShape
+        btnReset.background = resetButtonShape
+
+        btnReset.setOnClickListener {
+            startActivity(intent)
+            finish()
+        }
+
+        btnSubmit.setOnClickListener {
+            for (formViewComponent in formViewCollection) {
+                val view: View = formViewComponent.createdView
+                val viewComponentModel: FormComponentItem =
+                    formViewComponent.getViewComponentModel()
+                when (viewComponentModel.type) {
+                    "text" -> if (!getDataFromEditText(view, viewComponentModel)) {
+                        submitPropertyArrayJson = JsonArray()
+                    }
+                    "textarea" -> if (!getDataFromEditText(view, viewComponentModel)) {
+                        submitPropertyArrayJson = JsonArray()
+                    }
+                    "select" -> if (!getDataFromSpinner(view, viewComponentModel)) {
+                        submitPropertyArrayJson = JsonArray()
+                    }
+                    "radio-group" -> if (!getDataFromRadioGroup(view, viewComponentModel)) {
+                        submitPropertyArrayJson = JsonArray()
+                    }
+                    "date" -> getDataFromDateTextView(view, viewComponentModel)
+                    "checkbox-group" -> if (!getDataFromCheckBoxGroup(view, viewComponentModel)) {
+                        submitPropertyArrayJson = JsonArray()
+                    }
+                    "number" -> {
+                        if (!getDataFromEditText(view, viewComponentModel)) {
+                            submitPropertyArrayJson = JsonArray()
+                        }
+                    }
+                }
+            }
+
+            submitRootJsonObj.add("properties", submitPropertyArrayJson)
+            Log.i("JsonArray", submitRootJsonObj.toString())
+        }
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
