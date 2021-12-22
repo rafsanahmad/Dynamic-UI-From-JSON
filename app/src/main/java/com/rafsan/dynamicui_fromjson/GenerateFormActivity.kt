@@ -47,7 +47,11 @@ class GenerateFormActivity : AppCompatActivity() {
     var formViewCollection: ArrayList<FormViewComponent> = arrayListOf()
 
     var submitRootJsonObj: JsonObject? = null
-    var submitPropertyArrayJson: JsonArray? = null
+
+    companion object {
+        var submitPropertyArrayJson: JsonArray? = null
+    }
+
     var formComponent: FormComponent? = null
     val textColor = Color.parseColor("#000000")
 
@@ -882,7 +886,7 @@ class GenerateFormActivity : AppCompatActivity() {
                 }
             }
 
-            submitRootJsonObj.add("properties", submitPropertyArrayJson)
+            submitRootJsonObj?.add("properties", submitPropertyArrayJson)
             Log.i("JsonArray", submitRootJsonObj.toString())
         }
     }
