@@ -31,10 +31,7 @@ import com.rafsan.dynamicui_fromjson.data.CollectData.Companion.getDataFromRadio
 import com.rafsan.dynamicui_fromjson.data.CollectData.Companion.getDataFromSpinner
 import com.rafsan.dynamicui_fromjson.databinding.ActivityGenerateFormBinding
 import com.rafsan.dynamicui_fromjson.databinding.FormButtonsLayoutBinding
-import com.rafsan.dynamicui_fromjson.model.FormComponent
-import com.rafsan.dynamicui_fromjson.model.FormComponentItem
-import com.rafsan.dynamicui_fromjson.model.FormViewComponent
-import com.rafsan.dynamicui_fromjson.model.Value
+import com.rafsan.dynamicui_fromjson.model.*
 import com.rafsan.dynamicui_fromjson.utils.Utils
 import com.rafsan.dynamicui_fromjson.utils.Utils.Companion.getCurrentDate
 import com.rafsan.dynamicui_fromjson.utils.Utils.Companion.getCustomColorStateList
@@ -82,19 +79,19 @@ class GenerateFormActivity : AppCompatActivity() {
         formComponent?.let {
             it.forEach { component ->
                 when (component.type) {
-                    "header" -> binding.miniAppFormContainer.addView(
+                    WidgetItems.HEADER.label -> binding.miniAppFormContainer.addView(
                         createHeaderView(
                             component
                         )
                     )
-                    "text" -> createEditableTextWithLabel(component, viewId++)
-                    "textarea" -> createEditableTextWithLabel(component, viewId++)
-                    "select" -> createSpinner(component, viewId++)
-                    "radio-group" -> createRadioGroup(component, viewId++)
-                    "paragraph" -> createParagraph(component)
-                    "date" -> createDatePicker(component)
-                    "checkbox-group" -> createCheckBoxGroup(component, viewId++)
-                    "number" -> createNumberEditText(component)
+                    WidgetItems.TEXT.label -> createEditableTextWithLabel(component, viewId++)
+                    WidgetItems.TEXTAREA.label -> createEditableTextWithLabel(component, viewId++)
+                    WidgetItems.SELECT.label -> createSpinner(component, viewId++)
+                    WidgetItems.RADIO_GROUP.label -> createRadioGroup(component, viewId++)
+                    WidgetItems.PARAGRAPH.label -> createParagraph(component)
+                    WidgetItems.DATE.label -> createDatePicker(component)
+                    WidgetItems.CHECKBOX_GROUP.label -> createCheckBoxGroup(component, viewId++)
+                    WidgetItems.NUMBER.label -> createNumberEditText(component)
                 }
             }
         }
@@ -132,7 +129,7 @@ class GenerateFormActivity : AppCompatActivity() {
             LinearLayoutCompat.LayoutParams.MATCH_PARENT,
             LinearLayout.LayoutParams.WRAP_CONTENT
         )
-        if (component.type.equals("textarea")) editText.gravity = Gravity.NO_GRAVITY
+        if (component.type.equals(WidgetItems.TEXTAREA.label)) editText.gravity = Gravity.NO_GRAVITY
 
         editText.setPadding(20, 30, 20, 30)
         editText.setBackgroundResource(R.drawable.edit_text_background)
@@ -854,7 +851,7 @@ class GenerateFormActivity : AppCompatActivity() {
                 val viewComponentModel: FormComponentItem =
                     formViewComponent.getViewComponentModel()
                 when (viewComponentModel.type) {
-                    "text" ->
+                    WidgetItems.TEXT.label ->
                         if (!getDataFromEditText(view, viewComponentModel)) {
                             submitPropertyArrayJson = JsonArray()
                         } else {
@@ -862,7 +859,7 @@ class GenerateFormActivity : AppCompatActivity() {
                                 showRequiredDialog(labelStr)
                             }
                         }
-                    "textarea" ->
+                    WidgetItems.TEXTAREA.label ->
                         if (!getDataFromEditText(view, viewComponentModel)) {
                             submitPropertyArrayJson = JsonArray()
                         } else {
@@ -870,7 +867,7 @@ class GenerateFormActivity : AppCompatActivity() {
                                 showRequiredDialog(labelStr)
                             }
                         }
-                    "select" ->
+                    WidgetItems.SELECT.label ->
                         if (!getDataFromSpinner(view, viewComponentModel)) {
                             submitPropertyArrayJson = JsonArray()
                         } else {
@@ -878,7 +875,7 @@ class GenerateFormActivity : AppCompatActivity() {
                                 showRequiredDialog(labelStr)
                             }
                         }
-                    "radio-group" ->
+                    WidgetItems.RADIO_GROUP.label ->
                         if (!getDataFromRadioGroup(view, viewComponentModel)) {
                             submitPropertyArrayJson = JsonArray()
                         } else {
@@ -886,8 +883,8 @@ class GenerateFormActivity : AppCompatActivity() {
                                 showRequiredDialog(labelStr)
                             }
                         }
-                    "date" -> getDataFromDateTextView(view, viewComponentModel)
-                    "checkbox-group" ->
+                    WidgetItems.DATE.label -> getDataFromDateTextView(view, viewComponentModel)
+                    WidgetItems.CHECKBOX_GROUP.label ->
                         if (!getDataFromCheckBoxGroup(view, viewComponentModel)) {
                             submitPropertyArrayJson = JsonArray()
                         } else {
@@ -895,7 +892,7 @@ class GenerateFormActivity : AppCompatActivity() {
                                 showRequiredDialog(labelStr)
                             }
                         }
-                    "number" -> {
+                    WidgetItems.NUMBER.label -> {
                         if (!getDataFromEditText(view, viewComponentModel)) {
                             submitPropertyArrayJson = JsonArray()
                         } else {
