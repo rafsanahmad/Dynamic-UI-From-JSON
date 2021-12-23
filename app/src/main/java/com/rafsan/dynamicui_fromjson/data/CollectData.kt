@@ -247,7 +247,51 @@ class CollectData {
             view: View,
             viewComponentModel: FormComponentItem
         ): Boolean {
+            val spinner = view as Spinner
+
+            if (viewComponentModel.required != null && viewComponentModel.required) {
+                return if (spinner.selectedItem != null) {
+                    val json = populateSubmitPropertyJson(viewComponentModel, null)
+                    val selectedValues = populateSpinnerOptions(viewComponentModel, spinner)
+                    json.add("value", selectedValues)
+                    submitPropertyArrayJson?.add(json)
+                    Log.i("SpinnerSelectedItem", spinner.selectedItem.toString())
+                    true
+                } else {
+                    false
+                }
+            } else {
+                if (spinner.selectedItem != null) {
+                    val json = populateSubmitPropertyJson(viewComponentModel, null)
+                    val selectedValues = populateSpinnerOptions(viewComponentModel, spinner)
+                    json.add("value", selectedValues)
+                    submitPropertyArrayJson?.add(json)
+                    Log.i("SpinnerSelectedItem", spinner.selectedItem.toString())
+                    return true
+                }
+            }
+
             return true
+        }
+
+        fun populateSpinnerOptions(componentItem: FormComponentItem, spinner: Spinner): JsonArray {
+            val selectedValue = JsonObject()
+            val selectedValues = JsonArray()
+            selectedValue.addProperty("label", spinner.selectedItem.toString())
+            if (spinner.selectedItem.toString() == "Other") {
+                selectedValue.addProperty(
+                    "value",
+                    componentItem.values
+                        ?.get(spinner.selectedItemPosition)?.value
+                )
+            } else {
+                selectedValue.addProperty(
+                    "value",
+                    spinner.selectedItem.toString()
+                )
+            }
+            selectedValues.add(selectedValue)
+            return selectedValues
         }
 
         fun populateSubmitPropertyJson(
