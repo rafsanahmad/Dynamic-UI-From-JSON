@@ -1,5 +1,6 @@
 package com.rafsan.dynamicui_fromjson.data
 
+import android.util.Log
 import android.view.View
 import android.widget.*
 import androidx.appcompat.widget.SwitchCompat
@@ -10,6 +11,7 @@ import com.rafsan.dynamicui_fromjson.model.FormComponentItem
 import com.rafsan.dynamicui_fromjson.model.Value
 import com.rafsan.dynamicui_fromjson.utils.Utils.Companion.isValidEmailAddress
 import com.rafsan.dynamicui_fromjson.utils.Utils.Companion.isValidTelephoneNumber
+import java.util.*
 
 class CollectData {
     companion object {
@@ -24,12 +26,9 @@ class CollectData {
             viewComponentModel: FormComponentItem
         ) {
             val dateView = view as TextView
-            val submitPropertiesValueObj = JsonObject()
-            submitPropertiesValueObj.addProperty("label", viewComponentModel.label)
-            submitPropertiesValueObj.addProperty("value", dateView.text.toString())
-            submitPropertiesValueObj.addProperty("type", viewComponentModel.type)
-            submitPropertiesValueObj.addProperty("subtype", viewComponentModel.subtype)
-            submitPropertyArrayJson?.add(submitPropertiesValueObj)
+            val json = populateSubmitPropertyJson(viewComponentModel, null)
+            json.addProperty("value", dateView.text.toString())
+            submitPropertyArrayJson?.add(json)
         }
 
         /**
@@ -57,7 +56,6 @@ class CollectData {
         ): Boolean {
             val checkBoxContainer = view as LinearLayout
             val submitJsonValues = JsonArray()
-            val submitPropertiesValueObj = JsonObject()
             var valueModel: Value?
             var isChecked = false
             return if (viewComponentModel.required != null && viewComponentModel.required) {
@@ -69,7 +67,7 @@ class CollectData {
                         submitJsonValue.addProperty("label", checkBox.text.toString())
                         //submitJsonValue.addProperty("value", valueModel.getValue());
                         if (valueModel != null) {
-                            if (valueModel.label.equals("Other")) {
+                            if (valueModel.label == "Other") {
                                 submitJsonValue.addProperty("value", valueModel.value)
                             } else submitJsonValue.addProperty("value", checkBox.text.toString())
                         }
@@ -77,11 +75,9 @@ class CollectData {
                         isChecked = true
                     }
                 }
-                submitPropertiesValueObj.addProperty("label", viewComponentModel.label)
-                submitPropertiesValueObj.add("value", submitJsonValues)
-                submitPropertiesValueObj.addProperty("type", viewComponentModel.type)
-                submitPropertiesValueObj.addProperty("subtype", viewComponentModel.subtype)
-                submitPropertyArrayJson?.add(submitPropertiesValueObj)
+                val json = populateSubmitPropertyJson(viewComponentModel, null)
+                json.add("value", submitJsonValues)
+                submitPropertyArrayJson?.add(json)
                 return isChecked
             } else {
                 for (i in 0 until checkBoxContainer.childCount) {
@@ -99,11 +95,9 @@ class CollectData {
                         submitJsonValues.add(submitJsonValue)
                     }
                 }
-                submitPropertiesValueObj.addProperty("label", viewComponentModel.label)
-                submitPropertiesValueObj.add("value", submitJsonValues)
-                submitPropertiesValueObj.addProperty("type", viewComponentModel.type)
-                submitPropertiesValueObj.addProperty("subtype", viewComponentModel.subtype)
-                submitPropertyArrayJson?.add(submitPropertiesValueObj)
+                val json = populateSubmitPropertyJson(viewComponentModel, null)
+                json.add("value", submitJsonValues)
+                submitPropertyArrayJson?.add(json)
                 true
             }
         }
@@ -119,7 +113,6 @@ class CollectData {
         ): Boolean {
             val checkBoxContainer = view as LinearLayout
             val submitJsonValues = JsonArray()
-            val submitPropertiesValueObj = JsonObject()
             var valueModel: Value?
             var isChecked = false
             return if (viewComponentModel.required != null && viewComponentModel.required) {
@@ -131,7 +124,7 @@ class CollectData {
                         submitJsonValue.addProperty("label", aSwitch.text.toString())
                         //submitJsonValue.addProperty("value", valueModel.getValue());
                         if (valueModel != null) {
-                            if (valueModel.label.equals("Other")) {
+                            if (valueModel.label == "Other") {
                                 submitJsonValue.addProperty("value", valueModel.value)
                             } else submitJsonValue.addProperty("value", aSwitch.text.toString())
                         }
@@ -139,11 +132,9 @@ class CollectData {
                         isChecked = true
                     }
                 }
-                submitPropertiesValueObj.addProperty("label", viewComponentModel.label)
-                submitPropertiesValueObj.add("value", submitJsonValues)
-                submitPropertiesValueObj.addProperty("type", viewComponentModel.type)
-                submitPropertiesValueObj.addProperty("subtype", viewComponentModel.subtype)
-                submitPropertyArrayJson?.add(submitPropertiesValueObj)
+                val json = populateSubmitPropertyJson(viewComponentModel, null)
+                json.add("value", submitJsonValues)
+                submitPropertyArrayJson?.add(json)
                 return isChecked
             } else {
                 for (i in 0 until (viewComponentModel.values?.size ?: 0)) {
@@ -154,18 +145,16 @@ class CollectData {
                         submitJsonValue.addProperty("label", aSwitch.text.toString())
                         //submitJsonValue.addProperty("value", valueModel.getValue());
                         if (valueModel != null) {
-                            if (valueModel.label.equals("Other")) {
+                            if (valueModel.label == "Other") {
                                 submitJsonValue.addProperty("value", valueModel.value)
                             } else submitJsonValue.addProperty("value", aSwitch.text.toString())
                         }
                         submitJsonValues.add(submitJsonValue)
                     }
                 }
-                submitPropertiesValueObj.addProperty("label", viewComponentModel.label)
-                submitPropertiesValueObj.add("value", submitJsonValues)
-                submitPropertiesValueObj.addProperty("type", viewComponentModel.type)
-                submitPropertiesValueObj.addProperty("subtype", viewComponentModel.subtype)
-                submitPropertyArrayJson?.add(submitPropertiesValueObj)
+                val json = populateSubmitPropertyJson(viewComponentModel, null)
+                json.add("value", submitJsonValues)
+                submitPropertyArrayJson?.add(json)
                 true
             }
         }
@@ -180,7 +169,6 @@ class CollectData {
             viewComponentModel: FormComponentItem
         ): Boolean {
             val editText = view as EditText
-            val submitPropertiesValueObj = JsonObject()
             if (editText.text.toString() != "") {
                 viewComponentModel.required?.let {
                     //Not null
@@ -189,38 +177,22 @@ class CollectData {
                             return false
                         } else {
                             viewComponentModel.subtype?.let { subType ->
-                                if (subType.equals("tel")) {
+                                if (subType == "tel") {
                                     if (!isValidTelephoneNumber(editText.text.toString())) {
                                         return false
                                     }
-                                } else if (subType.equals("email")) {
+                                } else if (subType == "email") {
                                     if (!isValidEmailAddress(editText.text.toString())) {
                                         return false
                                     }
                                 }
                             }
                         }
-                        submitPropertiesValueObj.addProperty(
-                            "label",
-                            viewComponentModel.label
-                        )
-                        submitPropertiesValueObj.addProperty("value", editText.text.toString())
-                        submitPropertiesValueObj.addProperty(
-                            "type",
-                            viewComponentModel.type
-                        )
-                        submitPropertiesValueObj.addProperty(
-                            "subtype",
-                            viewComponentModel.subtype
-                        )
-                        submitPropertyArrayJson!!.add(submitPropertiesValueObj)
                     }
                 }
-                submitPropertiesValueObj.addProperty("label", viewComponentModel.label)
-                submitPropertiesValueObj.addProperty("value", editText.text.toString())
-                submitPropertiesValueObj.addProperty("type", viewComponentModel.type)
-                submitPropertiesValueObj.addProperty("subtype", viewComponentModel.subtype)
-                submitPropertyArrayJson!!.add(submitPropertiesValueObj)
+                val json = populateSubmitPropertyJson(viewComponentModel, null)
+                json.addProperty("value", editText.text.toString())
+                submitPropertyArrayJson?.add(json)
             }
             return true
         }
@@ -234,7 +206,36 @@ class CollectData {
             view: View,
             viewComponentModel: FormComponentItem
         ): Boolean {
-            return true
+            val radioGroup = view as RadioGroup
+            val valuesModels: ArrayList<Value> = viewComponentModel.values as ArrayList<Value>
+            val valueModel: Value
+            val radioButton: RadioButton
+            val radioButtonIndex: Int
+            return if (viewComponentModel.required != null && viewComponentModel.required) {
+                if (radioGroup.checkedRadioButtonId != -1) {
+                    radioButton =
+                        radioGroup.findViewById<View>(radioGroup.checkedRadioButtonId) as RadioButton
+                    radioButtonIndex = radioGroup.indexOfChild(radioButton)
+                    valueModel = valuesModels[radioButtonIndex]
+                    val json = populateSubmitPropertyJson(viewComponentModel, valueModel)
+                    submitPropertyArrayJson?.add(json)
+                    Log.i("selectedRadioButton", valueModel.label)
+                    true
+                } else {
+                    false
+                }
+            } else {
+                if (radioGroup.checkedRadioButtonId != -1) {
+                    radioButton =
+                        radioGroup.findViewById<View>(radioGroup.checkedRadioButtonId) as RadioButton
+                    radioButtonIndex = radioGroup.indexOfChild(radioButton)
+                    valueModel = valuesModels[radioButtonIndex]
+                    val json = populateSubmitPropertyJson(viewComponentModel, valueModel)
+                    submitPropertyArrayJson?.add(json)
+                    Log.i("selectedRadioButton", valueModel.label)
+                }
+                true
+            }
         }
 
         /**
@@ -247,6 +248,22 @@ class CollectData {
             viewComponentModel: FormComponentItem
         ): Boolean {
             return true
+        }
+
+        fun populateSubmitPropertyJson(
+            componentItem: FormComponentItem,
+            valueModel: Value?
+        ): JsonObject {
+            val submitPropertiesValueObj = JsonObject()
+            submitPropertiesValueObj.addProperty("label", componentItem.label)
+            valueModel?.let {
+                if (it.label == "Other") {
+                    submitPropertiesValueObj.addProperty("value", it.value)
+                } else submitPropertiesValueObj.addProperty("value", it.label)
+            }
+            submitPropertiesValueObj.addProperty("type", componentItem.type)
+            submitPropertiesValueObj.addProperty("subtype", componentItem.subtype)
+            return submitPropertiesValueObj
         }
     }
 }
