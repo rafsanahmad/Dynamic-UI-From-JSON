@@ -209,7 +209,7 @@ class CollectData {
             val radioGroup = view as RadioGroup
             val valuesModels: ArrayList<Value> = viewComponentModel.values as ArrayList<Value>
             val valueModel: Value
-            val radioButton: RadioButton
+            val radioButton: RadioButton?
             val radioButtonIndex: Int
             return if (viewComponentModel.required != null && viewComponentModel.required) {
                 if (radioGroup.checkedRadioButtonId != -1) {
@@ -227,12 +227,14 @@ class CollectData {
             } else {
                 if (radioGroup.checkedRadioButtonId != -1) {
                     radioButton =
-                        radioGroup.findViewById<View>(radioGroup.checkedRadioButtonId) as RadioButton
-                    radioButtonIndex = radioGroup.indexOfChild(radioButton)
-                    valueModel = valuesModels[radioButtonIndex]
-                    val json = populateSubmitPropertyJson(viewComponentModel, valueModel)
-                    submitPropertyArrayJson?.add(json)
-                    Log.i("selectedRadioButton", valueModel.label)
+                        radioGroup.findViewById<View>(radioGroup.checkedRadioButtonId) as? RadioButton
+                    radioButton?.let {
+                        radioButtonIndex = radioGroup.indexOfChild(it)
+                        valueModel = valuesModels[radioButtonIndex]
+                        val json = populateSubmitPropertyJson(viewComponentModel, valueModel)
+                        submitPropertyArrayJson?.add(json)
+                        Log.i("selectedRadioButton", valueModel.label)
+                    }
                 }
                 true
             }
@@ -308,6 +310,18 @@ class CollectData {
             submitPropertiesValueObj.addProperty("type", componentItem.type)
             submitPropertiesValueObj.addProperty("subtype", componentItem.subtype)
             return submitPropertiesValueObj
+        }
+
+        fun printProperties(array: JsonArray): String {
+            val builder: StringBuilder = StringBuilder()
+            for (i in 0 until array.size()) {
+                val propObj = array[i].asJsonObject
+                val label = propObj.get("label")
+                val value = propObj.get("value")
+                builder.append(label).append(" : ").append(value)
+                builder.append("\n")
+            }
+            return builder.toString()
         }
     }
 }

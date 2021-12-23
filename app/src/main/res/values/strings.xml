@@ -2,4 +2,5 @@
     <string name="app_name">Form Builder</string>
     <string name="reset">Reset</string>
     <string name="submit">Submit</string>
+    <string name="ok">Ok</string>
 </resources>

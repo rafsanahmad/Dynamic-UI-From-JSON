@@ -29,6 +29,7 @@ import com.rafsan.dynamicui_fromjson.data.CollectData.Companion.getDataFromDateT
 import com.rafsan.dynamicui_fromjson.data.CollectData.Companion.getDataFromEditText
 import com.rafsan.dynamicui_fromjson.data.CollectData.Companion.getDataFromRadioGroup
 import com.rafsan.dynamicui_fromjson.data.CollectData.Companion.getDataFromSpinner
+import com.rafsan.dynamicui_fromjson.data.CollectData.Companion.printProperties
 import com.rafsan.dynamicui_fromjson.databinding.ActivityGenerateFormBinding
 import com.rafsan.dynamicui_fromjson.databinding.FormButtonsLayoutBinding
 import com.rafsan.dynamicui_fromjson.model.*
@@ -853,32 +854,24 @@ class GenerateFormActivity : AppCompatActivity() {
                 when (viewComponentModel.type) {
                     WidgetItems.TEXT.label ->
                         if (!getDataFromEditText(view, viewComponentModel)) {
-                            submitPropertyArrayJson = JsonArray()
-                        } else {
                             viewComponentModel.label?.let { labelStr ->
                                 showRequiredDialog(labelStr)
                             }
                         }
                     WidgetItems.TEXTAREA.label ->
                         if (!getDataFromEditText(view, viewComponentModel)) {
-                            submitPropertyArrayJson = JsonArray()
-                        } else {
                             viewComponentModel.label?.let { labelStr ->
                                 showRequiredDialog(labelStr)
                             }
                         }
                     WidgetItems.SELECT.label ->
                         if (!getDataFromSpinner(view, viewComponentModel)) {
-                            submitPropertyArrayJson = JsonArray()
-                        } else {
                             viewComponentModel.label?.let { labelStr ->
                                 showRequiredDialog(labelStr)
                             }
                         }
                     WidgetItems.RADIO_GROUP.label ->
                         if (!getDataFromRadioGroup(view, viewComponentModel)) {
-                            submitPropertyArrayJson = JsonArray()
-                        } else {
                             viewComponentModel.label?.let { labelStr ->
                                 showRequiredDialog(labelStr)
                             }
@@ -886,16 +879,12 @@ class GenerateFormActivity : AppCompatActivity() {
                     WidgetItems.DATE.label -> getDataFromDateTextView(view, viewComponentModel)
                     WidgetItems.CHECKBOX_GROUP.label ->
                         if (!getDataFromCheckBoxGroup(view, viewComponentModel)) {
-                            submitPropertyArrayJson = JsonArray()
-                        } else {
                             viewComponentModel.label?.let { labelStr ->
                                 showRequiredDialog(labelStr)
                             }
                         }
                     WidgetItems.NUMBER.label -> {
                         if (!getDataFromEditText(view, viewComponentModel)) {
-                            submitPropertyArrayJson = JsonArray()
-                        } else {
                             viewComponentModel.label?.let { labelStr ->
                                 showRequiredDialog(labelStr)
                             }
@@ -906,6 +895,11 @@ class GenerateFormActivity : AppCompatActivity() {
 
             submitRootJsonObj?.add("properties", submitPropertyArrayJson)
             Log.i("JsonArray", submitRootJsonObj.toString())
+            submitPropertyArrayJson?.let {
+                val collectedData = printProperties(it)
+                ShowDialog.customDialog(this, "Collected Data", collectedData, null)
+                submitPropertyArrayJson = JsonArray()
+            }
         }
     }
 
